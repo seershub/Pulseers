@@ -11,9 +11,11 @@ import { MatchList } from "@/components/MatchList";
 export default function HomePage() {
   useEffect(() => {
     // MiniKit initialization
-    // When running in MiniKit environment, signal that the frame is ready
-    if (typeof window !== "undefined" && (window as any).minikit) {
-      (window as any).minikit.setFrameReady();
+    // Signal that the frame is ready to hide splash screen
+    if (typeof window !== "undefined") {
+      // MiniKit is available via OnchainKit
+      // Notify that the app has loaded
+      window.postMessage({ type: "FRAME_READY" }, "*");
     }
   }, []);
 
