@@ -10,7 +10,7 @@
   }
 
   * {
-    @apply border-border;
+    border-color: theme('colors.white' / 0.1);
   }
 
   body {
