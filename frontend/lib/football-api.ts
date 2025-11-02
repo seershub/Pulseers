@@ -169,8 +169,8 @@ export class FootballAPI {
         match.score?.fullTime?.home !== null &&
         match.score?.fullTime?.away !== null
           ? {
-              home: match.score.fullTime.home,
-              away: match.score.fullTime.away,
+              home: match.score!.fullTime.home,
+              away: match.score!.fullTime.away,
             }
           : undefined,
     }));
