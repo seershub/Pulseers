@@ -28,10 +28,15 @@ async function main() {
   console.log("✅ Pulseers proxy deployed to:", proxyAddress);
 
   // Get implementation address
-  const implementationAddress = await upgrades.erc1967.getImplementationAddress(
-    proxyAddress
-  );
-  console.log("📦 Implementation deployed to:", implementationAddress);
+  let implementationAddress = "";
+  try {
+    implementationAddress = await upgrades.erc1967.getImplementationAddress(
+      proxyAddress
+    );
+    console.log("📦 Implementation deployed to:", implementationAddress);
+  } catch (error) {
+    console.log("⚠️  Could not retrieve implementation address (proxy deployed successfully)");
+  }
 
   console.log("\n📝 Deployment Summary:");
   console.log("=".repeat(50));
