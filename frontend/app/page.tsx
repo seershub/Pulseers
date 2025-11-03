@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import { TrendingUp, Zap, CheckCircle, Trophy } from "lucide-react";
 import { sdk } from "@/lib/farcaster-sdk";
 import { useWallet } from "@/hooks/useWallet";
+import { MatchStatus } from "@/lib/contracts";
 
 /**
  * Main Page Component
@@ -300,9 +301,11 @@ export default function HomePage() {
             </>
           ) : (
             <>
-              <MatchList status={activeFilter} />
+              {activeFilter !== "ALL" && (
+                <MatchList status={activeFilter as MatchStatus} />
+              )}
               {/* Show players section even when filtered */}
-              {activeFilter === "ALL" || activeFilter === "LIVE" ? (
+              {activeFilter === "LIVE" ? (
                 <section className="mt-10">
                   <PlayerCarousel
                     players={bestPlayers}
