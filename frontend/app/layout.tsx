@@ -40,11 +40,11 @@ export const metadata: Metadata = {
     // Farcaster Mini App embed metadata
     "fc:miniapp": JSON.stringify({
       version: "next",
-      imageUrl: "https://pulseers.seershub.com/hero.png",
+      imageUrl: "https://pulseers.seershub.com/og-image.png",
       button: {
         title: "Launch Pulseers",
         action: {
-          type: "launch_miniapp",
+          type: "launch_frame",
           name: "Pulseers",
           url: "https://pulseers.seershub.com",
           splashImageUrl: "https://pulseers.seershub.com/splash.png",
