@@ -4,10 +4,13 @@ import { useReadContract, useAccount } from "wagmi";
 import { PULSEERS_ADDRESS, PULSEERS_ABI } from "@/lib/contracts";
 import { useState, useEffect } from "react";
 import { sdk } from "@/lib/farcaster-sdk";
+import { createWalletClient, custom } from "viem";
+import { base } from "viem/chains";
 
 /**
  * Hook to check if user has already signaled for a match
  * Works with both regular wallets and Farcaster wallet
+ * Follows Farcaster miniapp best practices
  */
 export function useUserSignal(matchId: bigint) {
   const { address: wagmiAddress } = useAccount();
@@ -15,6 +18,7 @@ export function useUserSignal(matchId: bigint) {
   const [userAddress, setUserAddress] = useState<string | null>(null);
 
   // Get Farcaster wallet address if available
+  // Using same pattern as useSignal.ts for consistency
   useEffect(() => {
     const getFarcasterAddress = async () => {
       try {
@@ -22,26 +26,20 @@ export function useUserSignal(matchId: bigint) {
         if (isInMiniApp && !wagmiAddress) {
           const context = await sdk.context;
           if (context.user && sdk.wallet?.ethProvider) {
-            // Get address from Farcaster wallet using ethProvider
             try {
-              const accounts = await sdk.wallet.ethProvider.request({
-                method: "eth_accounts",
+              // Use viem wallet client (same pattern as useSignal.ts)
+              // This is the recommended way per Farcaster miniapp docs
+              const walletClient = createWalletClient({
+                chain: base,
+                transport: custom(sdk.wallet.ethProvider),
               });
-              if (accounts && Array.isArray(accounts) && accounts.length > 0) {
-                setFarcasterAddress(accounts[0]);
+              
+              const [addr] = await walletClient.getAddresses();
+              if (addr) {
+                setFarcasterAddress(addr);
               }
             } catch (err) {
-              // If eth_accounts fails, try eth_requestAccounts
-              try {
-                const accounts = await sdk.wallet.ethProvider.request({
-                  method: "eth_requestAccounts",
-                });
-                if (accounts && Array.isArray(accounts) && accounts.length > 0) {
-                  setFarcasterAddress(accounts[0]);
-                }
-              } catch (err2) {
-                console.warn("Could not get Farcaster wallet address:", err2);
-              }
+              console.warn("Could not get Farcaster wallet address:", err);
             }
           }
         }
