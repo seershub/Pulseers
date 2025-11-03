@@ -65,14 +65,6 @@ export function useSignal() {
 
       console.log("👤 Using account:", accountToUse);
 
-      // Verify we're on Base Mainnet
-      const chainId = await clientToUse.getChainId();
-      console.log("🔗 Chain ID:", chainId, "(should be 8453 for Base Mainnet)");
-
-      if (chainId !== 8453) {
-        throw new Error(`Wrong network! Please switch to Base Mainnet (Chain ID: 8453). Current: ${chainId}`);
-      }
-
       const contractAddress = getContractAddress();
       console.log("📝 Contract:", contractAddress);
 
@@ -80,9 +72,17 @@ export function useSignal() {
         throw new Error("Public client not available");
       }
 
-      // Verify publicClient is also on Base Mainnet
-      const publicChainId = await publicClient.getChainId();
-      console.log("🔗 Public client Chain ID:", publicChainId);
+      // Optional: Verify chain (don't block if fails)
+      try {
+        const chainId = await clientToUse.getChainId();
+        console.log("🔗 Wallet Chain ID:", chainId, "(should be 8453)");
+
+        if (chainId !== 8453) {
+          console.warn("⚠️ Warning: Wallet may not be on Base Mainnet");
+        }
+      } catch (err) {
+        console.warn("⚠️ Could not verify wallet chain ID:", err);
+      }
 
       // Send transaction directly without simulation
       console.log("📤 Sending transaction to Base Mainnet...");
