@@ -1,28 +1,36 @@
 "use client";
 
 import { useWallet } from "@/hooks/useWallet";
+import { Header } from "@/components/Header";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { History, TrendingUp } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function HistoryPage() {
-  const { address, isConnected } = useWallet();
+  const { address, isConnected, isChecking } = useWallet();
   const router = useRouter();
 
-  useEffect(() => {
-    if (!isConnected) {
-      router.push("/");
-    }
-  }, [isConnected, router]);
-
-  if (!isConnected) {
-    return null;
+  // Show loading state while checking wallet
+  if (isChecking) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-gray-600">Loading wallet...</p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen py-12 px-4">
-      <div className="container mx-auto max-w-6xl">
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      <div className="flex-1 py-12 px-4">
+        <div className="container mx-auto max-w-6xl">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
           <h1 className="text-4xl md:text-5xl font-black gradient-text mb-3">
             Signal History
@@ -32,7 +40,12 @@ export default function HistoryPage() {
           </p>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass-card rounded-3xl p-12 text-center">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }} 
+          animate={{ opacity: 1, y: 0 }} 
+          transition={{ delay: 0.1 }} 
+          className="glass-card rounded-3xl p-12 text-center shadow-xl border border-blue-100/50 bg-gradient-to-br from-white to-blue-50/20 hover:shadow-2xl transition-all duration-300"
+        >
           <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-6">
             <History className="w-10 h-10 text-blue-600" />
           </div>
@@ -45,6 +58,7 @@ export default function HistoryPage() {
             Browse Matches
           </button>
         </motion.div>
+      </div>
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 "use client";
 
 import { useWallet } from "@/hooks/useWallet";
-import { useRouter } from "next/navigation";
+import { Header } from "@/components/Header";
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -10,16 +10,9 @@ import { motion } from "framer-motion";
 import { getFarcasterUser, isInFarcasterMiniApp } from "@/lib/farcaster-sdk";
 
 export default function ProfilePage() {
-  const { address, isConnected } = useWallet();
-  const router = useRouter();
+  const { address, isConnected, isChecking } = useWallet();
   const [farcasterUser, setFarcasterUser] = useState<any>(null);
   const [isInMiniApp, setIsInMiniApp] = useState(false);
-
-  useEffect(() => {
-    if (!isConnected) {
-      router.push("/");
-    }
-  }, [isConnected, router]);
 
   useEffect(() => {
     async function loadFarcasterData() {
@@ -36,13 +29,26 @@ export default function ProfilePage() {
     loadFarcasterData();
   }, []);
 
-  if (!isConnected) {
-    return null;
+  // Show loading state while checking wallet
+  if (isChecking) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-gray-600">Loading wallet...</p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen py-12 px-4">
-      <div className="container mx-auto max-w-6xl">
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      <div className="flex-1 py-12 px-4">
+        <div className="container mx-auto max-w-6xl">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card rounded-3xl p-8 mb-8">
           <div className="flex flex-col md:flex-row items-center gap-6">
             {/* Profile Picture */}
@@ -109,7 +115,7 @@ export default function ProfilePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="glass-card rounded-2xl p-6 text-center hover:shadow-xl transition-all"
+            className="glass-card rounded-2xl p-6 text-center hover:shadow-2xl hover:scale-105 transition-all duration-300 border border-blue-100/50 bg-gradient-to-br from-white to-blue-50/30"
           >
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mx-auto mb-3">
               <TrendingUp className="w-6 h-6 text-white" />
@@ -122,7 +128,7 @@ export default function ProfilePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
-            className="glass-card rounded-2xl p-6 text-center hover:shadow-xl transition-all"
+            className="glass-card rounded-2xl p-6 text-center hover:shadow-2xl hover:scale-105 transition-all duration-300 border border-green-100/50 bg-gradient-to-br from-white to-green-50/30"
           >
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center mx-auto mb-3">
               <Award className="w-6 h-6 text-white" />
@@ -135,7 +141,7 @@ export default function ProfilePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="glass-card rounded-2xl p-6 text-center hover:shadow-xl transition-all"
+            className="glass-card rounded-2xl p-6 text-center hover:shadow-2xl hover:scale-105 transition-all duration-300 border border-purple-100/50 bg-gradient-to-br from-white to-purple-50/30"
           >
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center mx-auto mb-3">
               <Target className="w-6 h-6 text-white" />
@@ -148,7 +154,7 @@ export default function ProfilePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.25 }}
-            className="glass-card rounded-2xl p-6 text-center hover:shadow-xl transition-all"
+            className="glass-card rounded-2xl p-6 text-center hover:shadow-2xl hover:scale-105 transition-all duration-300 border border-orange-100/50 bg-gradient-to-br from-white to-orange-50/30"
           >
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center mx-auto mb-3">
               <Trophy className="w-6 h-6 text-white" />
@@ -163,7 +169,7 @@ export default function ProfilePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="glass-card rounded-3xl p-8"
+          className="glass-card rounded-3xl p-8 shadow-xl border border-blue-100/50 bg-gradient-to-br from-white to-blue-50/20"
         >
           <h2 className="text-2xl font-black gradient-text mb-6 flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
@@ -186,6 +192,7 @@ export default function ProfilePage() {
             </Link>
           </div>
         </motion.div>
+      </div>
       </div>
     </div>
   );

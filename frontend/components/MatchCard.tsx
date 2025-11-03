@@ -66,7 +66,7 @@ export function MatchCard({ match, index }: MatchCardProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: index * 0.05 }}
-      className="match-card group"
+      className="match-card group shadow-xl hover:shadow-2xl transition-all duration-300 border border-blue-100/50"
     >
       {/* Header with League and Status */}
       <div className="flex items-center justify-between mb-6">
