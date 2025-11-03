@@ -72,15 +72,37 @@ export function useSignal() {
         throw new Error("Public client not available");
       }
 
-      // Optional: Verify chain (don't block if fails)
+      // CRITICAL: Verify chain - MUST be Base Mainnet
       try {
         const chainId = await clientToUse.getChainId();
-        console.log("🔗 Wallet Chain ID:", chainId, "(should be 8453)");
+        console.log("🔗 Wallet Chain ID:", chainId);
+
+        if (chainId === 84532) {
+          throw new Error(
+            "❌ Wrong Network!\n\n" +
+            "Your wallet is on Base Sepolia (Testnet).\n" +
+            "Please switch to Base Mainnet in your wallet.\n\n" +
+            "Current: Base Sepolia (84532)\n" +
+            "Required: Base Mainnet (8453)"
+          );
+        }
 
         if (chainId !== 8453) {
-          console.warn("⚠️ Warning: Wallet may not be on Base Mainnet");
+          throw new Error(
+            "❌ Wrong Network!\n\n" +
+            "Please switch to Base Mainnet in your wallet.\n\n" +
+            `Current Chain ID: ${chainId}\n` +
+            "Required: Base Mainnet (8453)"
+          );
         }
-      } catch (err) {
+
+        console.log("✅ Correct network: Base Mainnet");
+      } catch (err: any) {
+        // If it's our custom error, throw it
+        if (err.message?.includes("Wrong Network")) {
+          throw err;
+        }
+        // If we can't verify chain, warn but don't block
         console.warn("⚠️ Could not verify wallet chain ID:", err);
       }
 

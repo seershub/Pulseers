@@ -38,23 +38,92 @@ export default function HomePage() {
     <div className="min-h-screen flex flex-col safe-area-top safe-area-bottom">
       <Header />
 
-      <main className="flex-1 container mx-auto px-4 py-8 max-w-6xl">
-        {/* Hero Section */}
+      <main className="flex-1 container mx-auto px-4 max-w-6xl">
+        {/* Hero Section - Enhanced with Base Blue */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-10"
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="relative overflow-hidden rounded-3xl mb-12 mt-8"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-full border border-blue-100 mb-6">
-            <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse" />
-            <span className="text-sm font-semibold text-blue-700">Signal Your Team On-Chain</span>
+          {/* Animated Background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 opacity-95" />
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjEiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-30" />
+
+          {/* Floating Orbs Animation */}
+          <motion.div
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.3, 0.6, 0.3],
+            }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+            className="absolute top-10 right-10 w-64 h-64 bg-white rounded-full blur-3xl"
+          />
+          <motion.div
+            animate={{
+              scale: [1.2, 1, 1.2],
+              opacity: [0.2, 0.4, 0.2],
+            }}
+            transition={{
+              duration: 5,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 1,
+            }}
+            className="absolute bottom-10 left-10 w-96 h-96 bg-blue-300 rounded-full blur-3xl"
+          />
+
+          {/* Content */}
+          <div className="relative z-10 text-center py-16 px-6">
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.6 }}
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/20 backdrop-blur-md rounded-full border border-white/30 mb-6 shadow-xl"
+            >
+              <motion.div
+                animate={{ scale: [1, 1.3, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="w-2.5 h-2.5 bg-white rounded-full shadow-lg"
+              />
+              <span className="text-sm font-bold text-white tracking-wide">Signal Your Team On-Chain</span>
+            </motion.div>
+
+            <motion.h1
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.3, duration: 0.6 }}
+              className="text-5xl md:text-6xl lg:text-7xl font-black text-white mb-4 drop-shadow-2xl"
+            >
+              Pulseers
+            </motion.h1>
+
+            <motion.p
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.4, duration: 0.6 }}
+              className="text-white/90 text-lg md:text-xl max-w-2xl mx-auto font-medium leading-relaxed drop-shadow-lg"
+            >
+              Support your favorite teams with on-chain signals. One signal per match, powered by Base.
+            </motion.p>
+
+            {/* Base Logo Badge */}
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.5, duration: 0.6 }}
+              className="mt-6 inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20"
+            >
+              <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center">
+                <span className="text-blue-600 text-xs font-black">B</span>
+              </div>
+              <span className="text-white text-sm font-semibold">Built on Base</span>
+            </motion.div>
           </div>
-          <h1 className="text-4xl md:text-5xl font-black gradient-text mb-3">
-            Pulseers
-          </h1>
-          <p className="text-gray-600 text-base md:text-lg max-w-xl mx-auto">
-            Support your favorite teams with on-chain signals. One signal per match, powered by Base.
-          </p>
         </motion.div>
 
         {/* Filter Tabs - Grid Layout for Mobile */}
