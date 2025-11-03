@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { MatchWithStatus } from "@/lib/contracts";
 import { useSignal } from "@/hooks/useSignal";
 import { useUserSignal } from "@/hooks/useUserSignal";
@@ -97,11 +98,13 @@ export function MatchCard({ match, index }: MatchCardProps) {
           {/* Team A */}
           <div className="flex flex-col items-center gap-3">
             <div className="team-badge">
-              <img
+              <Image
                 src={match.logoA || "/placeholder-team.png"}
                 alt={match.teamA}
                 className="w-12 h-12 object-contain"
-                onError={(e) => {
+                width={48}
+                height={48}
+                onError={(e: any) => {
                   e.currentTarget.src = "/placeholder-team.png";
                 }}
               />
@@ -133,11 +136,13 @@ export function MatchCard({ match, index }: MatchCardProps) {
           {/* Team B */}
           <div className="flex flex-col items-center gap-3">
             <div className="team-badge">
-              <img
+              <Image
                 src={match.logoB || "/placeholder-team.png"}
                 alt={match.teamB}
                 className="w-12 h-12 object-contain"
-                onError={(e) => {
+                width={48}
+                height={48}
+                onError={(e: any) => {
                   e.currentTarget.src = "/placeholder-team.png";
                 }}
               />

@@ -2,6 +2,8 @@
 
 import { useAccount } from "wagmi";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Trophy, TrendingUp, Target, Award, User as UserIcon } from "lucide-react";
 import { motion } from "framer-motion";
@@ -45,10 +47,12 @@ export default function ProfilePage() {
           <div className="flex flex-col md:flex-row items-center gap-6">
             {/* Profile Picture */}
             {farcasterUser?.pfpUrl ? (
-              <img
+              <Image
                 src={farcasterUser.pfpUrl}
                 alt={farcasterUser.displayName || "Profile"}
                 className="w-24 h-24 rounded-full shadow-xl border-4 border-blue-100"
+                width={96}
+                height={96}
               />
             ) : (
               <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white text-3xl font-black shadow-xl">
@@ -176,10 +180,10 @@ export default function ProfilePage() {
             <p className="text-sm text-gray-500 mb-6">
               Start signaling for your favorite teams to build your stats
             </p>
-            <a href="/" className="btn-primary inline-flex items-center gap-2">
+            <Link href="/" className="btn-primary inline-flex items-center gap-2">
               <TrendingUp className="w-4 h-4" />
               View Matches
-            </a>
+            </Link>
           </div>
         </motion.div>
       </div>
