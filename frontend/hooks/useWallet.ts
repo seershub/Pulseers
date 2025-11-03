@@ -22,33 +22,54 @@ export function useWallet() {
   const [isChecking, setIsChecking] = useState(true);
 
   // Detect Farcaster/BaseApp wallet
+  // This runs immediately on mount to detect Farcaster context
   useEffect(() => {
     const checkFarcaster = async () => {
       try {
+        // Multiple detection methods for reliability
         const isInMiniApp = await sdk.isInMiniApp();
         const hasFarcasterWallet = !!(sdk.wallet?.ethProvider);
         const isInIframe = typeof window !== 'undefined' && window.self !== window.top;
+        
+        // Additional Farcaster context checks
+        const hasFarcasterContext = typeof window !== 'undefined' && (
+          (window as any).farcaster ||
+          (window as any).parent?.farcaster ||
+          navigator.userAgent.includes('Farcaster')
+        );
 
-        if (isInMiniApp || (hasFarcasterWallet && isInIframe) || hasFarcasterWallet) {
+        // If ANY indicator suggests Farcaster/BaseApp, use Farcaster wallet
+        const isFarcasterEnv = isInMiniApp || 
+                              (hasFarcasterWallet && isInIframe) || 
+                              hasFarcasterWallet ||
+                              hasFarcasterContext;
+
+        if (isFarcasterEnv) {
           setIsFarcasterAvailable(true);
+          console.log("📱 Farcaster/BaseApp environment detected");
           
           try {
             // Get address from Farcaster wallet
-            const walletClient = createWalletClient({
-              chain: base,
-              transport: custom(sdk.wallet.ethProvider),
-            });
+            if (sdk.wallet?.ethProvider) {
+              const walletClient = createWalletClient({
+                chain: base,
+                transport: custom(sdk.wallet.ethProvider),
+              });
 
-            const [addr] = await walletClient.getAddresses();
-            if (addr) {
-              setFarcasterAddress(addr);
-              console.log("✅ Farcaster wallet detected:", addr);
+              const [addr] = await walletClient.getAddresses();
+              if (addr) {
+                setFarcasterAddress(addr);
+                console.log("✅ Farcaster wallet address:", addr);
+              }
+            } else {
+              console.warn("⚠️ Farcaster environment detected but wallet provider not available");
             }
           } catch (err) {
             console.warn("⚠️ Could not get Farcaster wallet address:", err);
           }
         } else {
           setIsFarcasterAvailable(false);
+          console.log("🌐 Browser environment detected");
         }
       } catch (error) {
         console.error("Error checking Farcaster wallet:", error);
@@ -58,6 +79,7 @@ export function useWallet() {
       }
     };
 
+    // Run immediately
     checkFarcaster();
   }, []);
 

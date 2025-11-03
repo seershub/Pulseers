@@ -90,6 +90,7 @@ export function Header() {
                 </span>
               </div>
             )}
+            {/* ConnectWallet only shows in browser, never in Farcaster/BaseApp */}
             <ConnectWallet />
           </div>
         </div>

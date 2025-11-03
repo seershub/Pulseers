@@ -13,30 +13,51 @@ import { sdk } from "@/lib/farcaster-sdk";
 
 /**
  * Smart Wallet Component
- * - In Farcaster/BaseApp: Hides connect button (wallet auto-connected)
+ * - In Farcaster/BaseApp: Hides connect button completely (wallet auto-connected)
  * - In Browser: Shows OnchainKit connect button for MetaMask, Coinbase, etc.
+ * 
+ * CRITICAL: This component must NEVER render OnchainKit Wallet in Farcaster/BaseApp
+ * because it will try to open Base Wallet popup, which is not desired.
  */
 export function ConnectWallet() {
-  const { isFarcasterAvailable, isFarcaster, isConnected } = useWallet();
-  const [shouldShowConnect, setShouldShowConnect] = useState(true);
+  const { isFarcasterAvailable, isFarcaster, isConnected, isChecking } = useWallet();
+  const [shouldShowConnect, setShouldShowConnect] = useState(false); // Start with false to prevent flash
+  const [isInFarcasterContext, setIsInFarcasterContext] = useState(false);
 
   useEffect(() => {
     const checkContext = async () => {
       try {
+        // Multiple detection methods for maximum reliability
         const isInMiniApp = await sdk.isInMiniApp();
         const hasFarcasterWallet = !!(sdk.wallet?.ethProvider);
         const isInIframe = typeof window !== 'undefined' && window.self !== window.top;
+        
+        // Check for Farcaster-specific user agent or window properties
+        const hasFarcasterContext = typeof window !== 'undefined' && (
+          (window as any).farcaster ||
+          (window as any).parent?.farcaster ||
+          navigator.userAgent.includes('Farcaster')
+        );
 
-        // Hide connect button in Farcaster/BaseApp (wallet is auto-connected)
-        if (isInMiniApp || (hasFarcasterWallet && isInIframe) || hasFarcasterWallet) {
+        // If ANY indicator suggests Farcaster/BaseApp, hide connect button
+        const inFarcasterBaseApp = isInMiniApp || 
+                                   (hasFarcasterWallet && isInIframe) || 
+                                   hasFarcasterWallet ||
+                                   hasFarcasterContext;
+
+        setIsInFarcasterContext(inFarcasterBaseApp);
+
+        if (inFarcasterBaseApp) {
+          console.log("🚫 Farcaster/BaseApp detected - hiding ConnectWallet button");
           setShouldShowConnect(false);
         } else {
-          // Show connect button in browser
+          console.log("✅ Browser detected - showing ConnectWallet button");
           setShouldShowConnect(true);
         }
       } catch (error) {
         console.error("Error checking context:", error);
-        // Default to showing connect button if check fails
+        // If check fails, assume browser (safer to show than hide)
+        setIsInFarcasterContext(false);
         setShouldShowConnect(true);
       }
     };
@@ -44,8 +65,17 @@ export function ConnectWallet() {
     checkContext();
   }, []);
 
-  // Don't show connect button in Farcaster/BaseApp
-  if (!shouldShowConnect || (isFarcasterAvailable && isFarcaster)) {
+  // CRITICAL: Never show OnchainKit Wallet in Farcaster/BaseApp
+  // This prevents Base Wallet popup from appearing
+  if (isInFarcasterContext || 
+      (isFarcasterAvailable && isFarcaster) || 
+      (!shouldShowConnect && !isChecking)) {
+    // Return null - completely hide the component
+    return null;
+  }
+
+  // Only show in browser when we're sure we're not in Farcaster/BaseApp
+  if (!shouldShowConnect || isChecking) {
     return null;
   }
 
