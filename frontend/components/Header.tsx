@@ -1,6 +1,6 @@
 "use client";
 
-import { useAccount } from "wagmi";
+import { useWallet } from "@/hooks/useWallet";
 import { ConnectWallet } from "./ConnectWallet";
 import { User, History, Trophy } from "lucide-react";
 import Link from "next/link";
@@ -8,7 +8,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 
 export function Header() {
-  const { address, isConnected } = useAccount();
+  const { address, isConnected } = useWallet();
   const pathname = usePathname();
 
   const formatAddress = (addr: string) => {

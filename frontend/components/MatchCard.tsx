@@ -5,13 +5,12 @@ import Image from "next/image";
 import { MatchWithStatus } from "@/lib/contracts";
 import { useSignal } from "@/hooks/useSignal";
 import { useUserSignal } from "@/hooks/useUserSignal";
-import { useAccount } from "wagmi";
+import { useWallet } from "@/hooks/useWallet";
 import { formatMatchDate } from "@/lib/utils";
 import { Trophy, CalendarDays, TrendingUp, Users, CheckCircle2, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { AnimatedSignalBar } from "./AnimatedSignalBar";
-import { sdk } from "@/lib/farcaster-sdk";
 
 interface MatchCardProps {
   match: MatchWithStatus;
@@ -19,36 +18,21 @@ interface MatchCardProps {
 }
 
 export function MatchCard({ match, index }: MatchCardProps) {
-  const { isConnected } = useAccount();
+  const { isConnected } = useWallet();
   const { signal, isPending, isSuccess } = useSignal();
   const { hasSignaled, teamChoice, refetch } = useUserSignal(match.matchId);
   const [selectedTeam, setSelectedTeam] = useState<1 | 2 | null>(null);
-  const [isFarcasterConnected, setIsFarcasterConnected] = useState(false);
 
-  // Check if Farcaster wallet is available
-  useEffect(() => {
-    const checkFarcaster = async () => {
-      try {
-        const isInMiniApp = await sdk.isInMiniApp();
-        if (isInMiniApp) {
-          const context = await sdk.context;
-          setIsFarcasterConnected(!!context.user);
-        }
-      } catch (error) {
-        console.error("Error checking Farcaster:", error);
-      }
-    };
-    checkFarcaster();
-  }, []);
-
-  // Consider wallet connected if either regular wallet or Farcaster wallet is connected
-  const walletConnected = isConnected || isFarcasterConnected;
+  // Wallet is automatically detected by useWallet hook
+  const walletConnected = isConnected;
 
   const totalSignals = Number(match.signalsTeamA) + Number(match.signalsTeamB);
   const isActive = match.status !== "FINISHED";
 
   const handleSignal = async (teamId: 1 | 2) => {
     if (!walletConnected) {
+      // In Farcaster/BaseApp, wallet should be auto-connected
+      // Only show alert in browser
       alert("Please connect your wallet first");
       return;
     }

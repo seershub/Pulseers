@@ -1,6 +1,6 @@
 "use client";
 
-import { useAccount } from "wagmi";
+import { useWallet } from "@/hooks/useWallet";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -10,7 +10,7 @@ import { motion } from "framer-motion";
 import { getFarcasterUser, isInFarcasterMiniApp } from "@/lib/farcaster-sdk";
 
 export default function ProfilePage() {
-  const { address, isConnected } = useAccount();
+  const { address, isConnected } = useWallet();
   const router = useRouter();
   const [farcasterUser, setFarcasterUser] = useState<any>(null);
   const [isInMiniApp, setIsInMiniApp] = useState(false);

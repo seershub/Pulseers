@@ -1,13 +1,13 @@
 "use client";
 
-import { useAccount } from "wagmi";
+import { useWallet } from "@/hooks/useWallet";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { History, TrendingUp } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function HistoryPage() {
-  const { address, isConnected } = useAccount();
+  const { address, isConnected } = useWallet();
   const router = useRouter();
 
   useEffect(() => {
