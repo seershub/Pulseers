@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import { TrendingUp, Zap, CheckCircle, Trophy } from "lucide-react";
 import { sdk } from "@/lib/farcaster-sdk";
 import { useWallet } from "@/hooks/useWallet";
+import { usePlayerSignal } from "@/hooks/usePlayerSignal";
 import { MatchStatus } from "@/lib/contracts";
 
 /**
@@ -18,6 +19,7 @@ export default function HomePage() {
   const [activeFilter, setActiveFilter] = useState<"ALL" | "LIVE" | "UPCOMING" | "FINISHED">("ALL");
   const { isConnected } = useWallet();
   const [userSignaledPlayers, setUserSignaledPlayers] = useState<Set<string>>(new Set());
+  const { signal: signalPlayer, isPending: isPlayerSignalPending } = usePlayerSignal();
 
   useEffect(() => {
     // Initialize Farcaster SDK
@@ -32,14 +34,14 @@ export default function HomePage() {
     init();
   }, []);
 
-  // Mock player data - Replace with real data from API/contract
+  // Player data - Update image paths to your player card images
   const bestPlayers = [
     {
       id: "player-1",
       name: "Cristiano Ronaldo",
       position: "FW",
       team: "Al Nassr",
-      image: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&h=400&fit=crop",
+      image: "/player-1.png", // Update with your player card image path
       signalCount: 1247,
     },
     {
@@ -47,7 +49,7 @@ export default function HomePage() {
       name: "Lionel Messi",
       position: "FW",
       team: "Inter Miami",
-      image: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&h=400&fit=crop",
+      image: "/player-2.png", // Update with your player card image path
       signalCount: 1156,
     },
     {
@@ -55,7 +57,7 @@ export default function HomePage() {
       name: "Kylian Mbappé",
       position: "FW",
       team: "Paris Saint-Germain",
-      image: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&h=400&fit=crop",
+      image: "/player-3.png", // Update with your player card image path
       signalCount: 987,
     },
     {
@@ -63,29 +65,22 @@ export default function HomePage() {
       name: "Erling Haaland",
       position: "FW",
       team: "Manchester City",
-      image: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&h=400&fit=crop",
+      image: "/player-4.png", // Update with your player card image path
       signalCount: 856,
     },
   ];
 
   const handlePlayerSignal = async (playerId: string) => {
-    // TODO: Contract currently only supports match signaling, not player signaling
-    // To implement player signals, the contract needs to be extended with:
-    // - playerId mapping
-    // - userPlayerSignals mapping
-    // - signalPlayer(uint256 playerId) function
-    // For now, this is a mock implementation that updates local state only
-    
-    console.log("🎯 Signaling player:", playerId);
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Update local state (mock - not persisted on-chain)
-    setUserSignaledPlayers(prev => new Set(prev).add(playerId));
-    
-    // TODO: Implement on-chain player signal when contract is extended
-    // Example: await writeContract({ ...config, functionName: 'signalPlayer', args: [playerId] });
+    try {
+      const txHash = await signalPlayer(playerId);
+      console.log("✅ Player signal successful, txHash:", txHash);
+      
+      // Update local state after successful on-chain signal
+      setUserSignaledPlayers(prev => new Set(prev).add(playerId));
+    } catch (error: any) {
+      console.error("❌ Player signal error:", error);
+      throw error;
+    }
   };
 
   const filters = [

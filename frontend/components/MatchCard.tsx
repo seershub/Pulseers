@@ -86,7 +86,7 @@ export function MatchCard({ match, index }: MatchCardProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: index * 0.05 }}
-      className="match-card group shadow-xl hover:shadow-2xl transition-all duration-300 border border-blue-100/50"
+      className="match-card group shadow-xl hover:shadow-2xl transition-all duration-300 border border-blue-100/50 min-h-[600px]"
     >
       {/* Header with League and Status */}
       <div className="flex items-center justify-between mb-6">
@@ -208,7 +208,7 @@ export function MatchCard({ match, index }: MatchCardProps) {
         </div>
       </div>
 
-      {/* Signal Buttons - Compact */}
+      {/* Signal Buttons - Compact & Equal Height */}
       {/* CRITICAL: Only show buttons if NOT already signaled and wallet is connected */}
       {isActive && !hasSignaled && walletConnected && (
         <div className="grid grid-cols-2 gap-3">
@@ -218,18 +218,18 @@ export function MatchCard({ match, index }: MatchCardProps) {
             onClick={() => handleSignal(1)}
             disabled={isPending || hasSignaled}
             className={cn(
-              "relative overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed",
+              "relative overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed h-12 flex items-center justify-center",
               {
                 "animate-pulse": selectedTeam === 1 && isPending,
               }
             )}
           >
             {isPending && selectedTeam === 1 ? (
-              <Loader2 className="w-5 h-5 mx-auto animate-spin" />
+              <Loader2 className="w-5 h-5 animate-spin" />
             ) : (
               <div className="flex items-center justify-center gap-2">
                 <TrendingUp className="w-4 h-4" />
-                <span className="text-sm">Signal {match.teamA}</span>
+                <span className="text-sm">Signal</span>
               </div>
             )}
           </motion.button>
@@ -240,18 +240,18 @@ export function MatchCard({ match, index }: MatchCardProps) {
             onClick={() => handleSignal(2)}
             disabled={isPending || hasSignaled}
             className={cn(
-              "relative overflow-hidden bg-gradient-to-br from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed",
+              "relative overflow-hidden bg-gradient-to-br from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed h-12 flex items-center justify-center",
               {
                 "animate-pulse": selectedTeam === 2 && isPending,
               }
             )}
           >
             {isPending && selectedTeam === 2 ? (
-              <Loader2 className="w-5 h-5 mx-auto animate-spin" />
+              <Loader2 className="w-5 h-5 animate-spin" />
             ) : (
               <div className="flex items-center justify-center gap-2">
                 <TrendingUp className="w-4 h-4" />
-                <span className="text-sm">Signal {match.teamB}</span>
+                <span className="text-sm">Signal</span>
               </div>
             )}
           </motion.button>
