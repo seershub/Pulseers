@@ -7,8 +7,9 @@ import { http, createConfig } from "wagmi";
 import { base, baseSepolia } from "wagmi/chains";
 import { coinbaseWallet, injected } from "wagmi/connectors";
 
-// Determine which chain to use
-const isMainnet = process.env.NEXT_PUBLIC_CHAIN_ID === "8453";
+// Determine which chain to use - Default to Base Mainnet (8453)
+// This app only works on Base Mainnet, not testnet
+const isMainnet = process.env.NEXT_PUBLIC_CHAIN_ID !== "84532";
 const activeChain = isMainnet ? base : baseSepolia;
 
 export const config = createConfig({

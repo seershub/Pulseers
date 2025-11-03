@@ -2,20 +2,68 @@
 
 import { useReadContract, useAccount } from "wagmi";
 import { PULSEERS_ADDRESS, PULSEERS_ABI } from "@/lib/contracts";
+import { useState, useEffect } from "react";
+import { sdk } from "@/lib/farcaster-sdk";
 
 /**
  * Hook to check if user has already signaled for a match
+ * Works with both regular wallets and Farcaster wallet
  */
 export function useUserSignal(matchId: bigint) {
-  const { address } = useAccount();
+  const { address: wagmiAddress } = useAccount();
+  const [farcasterAddress, setFarcasterAddress] = useState<string | null>(null);
+  const [userAddress, setUserAddress] = useState<string | null>(null);
+
+  // Get Farcaster wallet address if available
+  useEffect(() => {
+    const getFarcasterAddress = async () => {
+      try {
+        const isInMiniApp = await sdk.isInMiniApp();
+        if (isInMiniApp && !wagmiAddress) {
+          const context = await sdk.context;
+          if (context.user && sdk.wallet?.ethProvider) {
+            // Get address from Farcaster wallet using ethProvider
+            try {
+              const accounts = await sdk.wallet.ethProvider.request({
+                method: "eth_accounts",
+              });
+              if (accounts && Array.isArray(accounts) && accounts.length > 0) {
+                setFarcasterAddress(accounts[0]);
+              }
+            } catch (err) {
+              // If eth_accounts fails, try eth_requestAccounts
+              try {
+                const accounts = await sdk.wallet.ethProvider.request({
+                  method: "eth_requestAccounts",
+                });
+                if (accounts && Array.isArray(accounts) && accounts.length > 0) {
+                  setFarcasterAddress(accounts[0]);
+                }
+              } catch (err2) {
+                console.warn("Could not get Farcaster wallet address:", err2);
+              }
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error checking Farcaster wallet:", error);
+      }
+    };
+    getFarcasterAddress();
+  }, [wagmiAddress]);
+
+  // Use wagmi address if available, otherwise use Farcaster address
+  useEffect(() => {
+    setUserAddress(wagmiAddress || farcasterAddress || null);
+  }, [wagmiAddress, farcasterAddress]);
 
   const { data: hasSignaled, refetch } = useReadContract({
     address: PULSEERS_ADDRESS,
     abi: PULSEERS_ABI,
     functionName: "hasUserSignaled",
-    args: address ? [matchId, address] : undefined,
+    args: userAddress ? [matchId, userAddress as `0x${string}`] : undefined,
     query: {
-      enabled: !!address && !!matchId,
+      enabled: !!userAddress && !!matchId,
     },
   });
 
@@ -23,9 +71,9 @@ export function useUserSignal(matchId: bigint) {
     address: PULSEERS_ADDRESS,
     abi: PULSEERS_ABI,
     functionName: "getUserTeamChoice",
-    args: address ? [matchId, address] : undefined,
+    args: userAddress ? [matchId, userAddress as `0x${string}`] : undefined,
     query: {
-      enabled: !!address && !!matchId && hasSignaled === true,
+      enabled: !!userAddress && !!matchId && hasSignaled === true,
     },
   });
 

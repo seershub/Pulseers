@@ -37,11 +37,13 @@ export function useSignal() {
       let accountToUse = address;
 
       // Check if we're in Farcaster Mini App and no regular wallet is connected
+      let isFarcasterWallet = false;
       if (!walletClient) {
         const isInMiniApp = await sdk.isInMiniApp();
 
         if (isInMiniApp) {
           console.log("📱 Using Farcaster Mini App wallet");
+          isFarcasterWallet = true;
           const context = await sdk.context;
           console.log("👤 Farcaster user:", context.user);
 
@@ -73,37 +75,42 @@ export function useSignal() {
       }
 
       // CRITICAL: Verify chain - MUST be Base Mainnet
-      try {
-        const chainId = await clientToUse.getChainId();
-        console.log("🔗 Wallet Chain ID:", chainId);
+      // NOTE: Farcaster wallet always uses Base Mainnet, so we skip chain check for it
+      if (!isFarcasterWallet) {
+        try {
+          const chainId = await clientToUse.getChainId();
+          console.log("🔗 Wallet Chain ID:", chainId);
 
-        if (chainId === 84532) {
-          throw new Error(
-            "❌ Wrong Network!\n\n" +
-            "Your wallet is on Base Sepolia (Testnet).\n" +
-            "Please switch to Base Mainnet in your wallet.\n\n" +
-            "Current: Base Sepolia (84532)\n" +
-            "Required: Base Mainnet (8453)"
-          );
-        }
+          if (chainId === 84532) {
+            throw new Error(
+              "❌ Wrong Network!\n\n" +
+              "Your wallet is on Base Sepolia (Testnet).\n" +
+              "Please switch to Base Mainnet in your wallet.\n\n" +
+              "Current: Base Sepolia (84532)\n" +
+              "Required: Base Mainnet (8453)"
+            );
+          }
 
-        if (chainId !== 8453) {
-          throw new Error(
-            "❌ Wrong Network!\n\n" +
-            "Please switch to Base Mainnet in your wallet.\n\n" +
-            `Current Chain ID: ${chainId}\n` +
-            "Required: Base Mainnet (8453)"
-          );
-        }
+          if (chainId !== 8453) {
+            throw new Error(
+              "❌ Wrong Network!\n\n" +
+              "Please switch to Base Mainnet in your wallet.\n\n" +
+              `Current Chain ID: ${chainId}\n` +
+              "Required: Base Mainnet (8453)"
+            );
+          }
 
-        console.log("✅ Correct network: Base Mainnet");
-      } catch (err: any) {
-        // If it's our custom error, throw it
-        if (err.message?.includes("Wrong Network")) {
-          throw err;
+          console.log("✅ Correct network: Base Mainnet");
+        } catch (err: any) {
+          // If it's our custom error, throw it
+          if (err.message?.includes("Wrong Network")) {
+            throw err;
+          }
+          // If we can't verify chain, warn but don't block
+          console.warn("⚠️ Could not verify wallet chain ID:", err);
         }
-        // If we can't verify chain, warn but don't block
-        console.warn("⚠️ Could not verify wallet chain ID:", err);
+      } else {
+        console.log("✅ Farcaster wallet - automatically on Base Mainnet");
       }
 
       // Send transaction directly without simulation

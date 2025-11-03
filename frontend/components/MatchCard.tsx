@@ -9,8 +9,9 @@ import { useAccount } from "wagmi";
 import { formatMatchDate } from "@/lib/utils";
 import { Trophy, CalendarDays, TrendingUp, Users, CheckCircle2, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AnimatedSignalBar } from "./AnimatedSignalBar";
+import { sdk } from "@/lib/farcaster-sdk";
 
 interface MatchCardProps {
   match: MatchWithStatus;
@@ -22,12 +23,32 @@ export function MatchCard({ match, index }: MatchCardProps) {
   const { signal, isPending, isSuccess } = useSignal();
   const { hasSignaled, teamChoice, refetch } = useUserSignal(match.matchId);
   const [selectedTeam, setSelectedTeam] = useState<1 | 2 | null>(null);
+  const [isFarcasterConnected, setIsFarcasterConnected] = useState(false);
+
+  // Check if Farcaster wallet is available
+  useEffect(() => {
+    const checkFarcaster = async () => {
+      try {
+        const isInMiniApp = await sdk.isInMiniApp();
+        if (isInMiniApp) {
+          const context = await sdk.context;
+          setIsFarcasterConnected(!!context.user);
+        }
+      } catch (error) {
+        console.error("Error checking Farcaster:", error);
+      }
+    };
+    checkFarcaster();
+  }, []);
+
+  // Consider wallet connected if either regular wallet or Farcaster wallet is connected
+  const walletConnected = isConnected || isFarcasterConnected;
 
   const totalSignals = Number(match.signalsTeamA) + Number(match.signalsTeamB);
   const isActive = match.status !== "FINISHED";
 
   const handleSignal = async (teamId: 1 | 2) => {
-    if (!isConnected) {
+    if (!walletConnected) {
       alert("Please connect your wallet first");
       return;
     }
@@ -184,7 +205,7 @@ export function MatchCard({ match, index }: MatchCardProps) {
       </div>
 
       {/* Signal Buttons - Compact */}
-      {isActive && !hasSignaled && isConnected && (
+      {isActive && !hasSignaled && walletConnected && (
         <div className="grid grid-cols-2 gap-3">
           <motion.button
             whileHover={{ scale: 1.05 }}
@@ -243,7 +264,7 @@ export function MatchCard({ match, index }: MatchCardProps) {
       )}
 
       {/* Connect Wallet Message */}
-      {!isConnected && isActive && (
+      {!walletConnected && isActive && (
         <div className="glass-card p-4 text-center border border-blue-200">
           <p className="text-sm text-gray-600">Connect your wallet to signal</p>
         </div>

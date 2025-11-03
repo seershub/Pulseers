@@ -8,7 +8,7 @@ export const PULSEERS_ADDRESS =
   "0x0000000000000000000000000000000000000000";
 
 export const CHAIN_ID = parseInt(
-  process.env.NEXT_PUBLIC_CHAIN_ID || "84532"
+  process.env.NEXT_PUBLIC_CHAIN_ID || "8453"
 );
 
 // Pulseers Contract ABI
