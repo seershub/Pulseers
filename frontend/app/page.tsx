@@ -99,29 +99,29 @@ export default function HomePage() {
             className="absolute top-1/2 left-1/2 w-64 h-64 bg-blue-200 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"
           />
 
-          {/* Content */}
-          <div className="relative z-10 text-center py-20 px-6">
+          {/* Content - Compact Hero Section */}
+          <div className="relative z-10 text-center py-10 md:py-12 px-6">
             {/* Animated Badge */}
             <motion.div
               initial={{ scale: 0.8, opacity: 0, y: -20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.6, type: "spring" }}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-white/25 backdrop-blur-lg rounded-full border-2 border-white/40 mb-8 shadow-2xl"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-white/25 backdrop-blur-lg rounded-full border-2 border-white/40 mb-4 shadow-xl"
             >
               <motion.div
-                animate={{ scale: [1, 1.4, 1], rotate: [0, 180, 360] }}
+                animate={{ scale: [1, 1.3, 1], rotate: [0, 180, 360] }}
                 transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                className="w-3 h-3 bg-white rounded-full shadow-lg"
+                className="w-2.5 h-2.5 bg-white rounded-full shadow-lg"
               />
-              <span className="text-sm font-bold text-white tracking-wide uppercase">Signal Your Team On-Chain</span>
+              <span className="text-xs md:text-sm font-bold text-white tracking-wide uppercase">Signal Your Team On-Chain</span>
             </motion.div>
 
             {/* Main Title with Animation */}
             <motion.h1
-              initial={{ y: 30, opacity: 0 }}
+              initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.3, duration: 0.8, type: "spring", stiffness: 100 }}
-              className="text-6xl md:text-7xl lg:text-8xl font-black text-white mb-6 drop-shadow-2xl"
+              transition={{ delay: 0.3, duration: 0.6, type: "spring" }}
+              className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-3 drop-shadow-2xl"
             >
               <motion.span
                 animate={{ 
@@ -138,34 +138,32 @@ export default function HomePage() {
               </motion.span>
             </motion.h1>
 
-            {/* Description with Stagger Animation */}
+            {/* Description */}
             <motion.p
-              initial={{ y: 20, opacity: 0 }}
+              initial={{ y: 10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.5, duration: 0.6 }}
-              className="text-white/95 text-xl md:text-2xl max-w-2xl mx-auto font-semibold leading-relaxed drop-shadow-xl mb-8"
+              transition={{ delay: 0.4, duration: 0.5 }}
+              className="text-white/90 text-base md:text-lg max-w-xl mx-auto font-medium leading-relaxed drop-shadow-lg mb-4"
             >
-              Support your favorite teams with on-chain signals.
-              <br />
-              <span className="text-white/80 text-lg md:text-xl font-medium">One signal per match, powered by Base.</span>
+              Support your favorite teams with on-chain signals. One signal per match, powered by Base.
             </motion.p>
 
-            {/* Base Logo Badge with Hover Effect */}
+            {/* Base Logo Badge */}
             <motion.div
-              initial={{ y: 20, opacity: 0 }}
+              initial={{ y: 10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.7, duration: 0.6 }}
+              transition={{ delay: 0.5, duration: 0.5 }}
               whileHover={{ scale: 1.05 }}
-              className="mt-8 inline-flex items-center gap-3 px-6 py-3 bg-white/20 backdrop-blur-lg rounded-full border-2 border-white/30 shadow-xl hover:bg-white/25 transition-all cursor-default"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-lg rounded-full border-2 border-white/30 shadow-lg hover:bg-white/25 transition-all cursor-default"
             >
               <motion.div
                 whileHover={{ rotate: 360 }}
                 transition={{ duration: 0.6 }}
-                className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-lg"
+                className="w-6 h-6 rounded-full bg-white flex items-center justify-center shadow-md"
               >
-                <span className="text-blue-600 text-sm font-black">B</span>
+                <span className="text-blue-600 text-xs font-black">B</span>
               </motion.div>
-              <span className="text-white text-base font-bold">Built on Base</span>
+              <span className="text-white text-sm font-semibold">Built on Base</span>
             </motion.div>
           </div>
         </motion.div>
