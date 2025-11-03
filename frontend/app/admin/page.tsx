@@ -170,9 +170,9 @@ export default function AdminPage() {
             How to Use
           </h2>
           <ol className="text-slate-300 text-sm space-y-2 list-decimal list-inside">
-            <li>Enter the contract owner's private key</li>
+            <li>Enter the contract owner&apos;s private key</li>
             <li>Select how many matches to add (default: 10)</li>
-            <li>Click "Add Matches to Contract"</li>
+            <li>Click &quot;Add Matches to Contract&quot;</li>
             <li>Wait for the transaction to confirm on Base</li>
             <li>Matches will appear on the main page</li>
           </ol>
