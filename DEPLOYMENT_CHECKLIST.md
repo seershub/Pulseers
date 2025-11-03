@@ -24,7 +24,7 @@ NEXT_PUBLIC_BASE_RPC_URL=https://mainnet.base.org
 NEXT_PUBLIC_CDP_API_KEY=<your-coinbase-api-key>
 NEXT_PUBLIC_WC_PROJECT_ID=<your-walletconnect-project-id>
 NEXT_PUBLIC_FOOTBALL_API_KEY=<your-football-data-api-key>
-NEXT_PUBLIC_URL=https://your-actual-domain.vercel.app
+NEXT_PUBLIC_URL=https://pulseers.seershub.com
 NEXT_PUBLIC_APP_NAME=Pulseers
 NEXT_PUBLIC_APP_DESCRIPTION=Signal your support for your favorite teams on-chain
 ```
@@ -50,14 +50,14 @@ NEXT_PUBLIC_APP_DESCRIPTION=Signal your support for your favorite teams on-chain
 
 ### 3. 🔄 **Farcaster Manifest URL'leri Güncelle**
 
-`/frontend/public/.well-known/farcaster.json` dosyasını aç ve `your-domain.vercel.app` kısımlarını gerçek domain'inle değiştir:
+`/frontend/public/.well-known/farcaster.json` dosyasını aç ve `pulseers.seershub.com` kısımlarını gerçek domain'inle değiştir:
 
 ```json
 {
   "frame": {
-    "iconUrl": "https://GERÇEK-DOMAIN.vercel.app/icon-512x512.png",
-    "splashImageUrl": "https://GERÇEK-DOMAIN.vercel.app/splash.png",
-    "homeUrl": "https://GERÇEK-DOMAIN.vercel.app"
+    "iconUrl": "https://pulseers.seershub.com/icon-512x512.png",
+    "splashImageUrl": "https://pulseers.seershub.com/splash.png",
+    "homeUrl": "https://pulseers.seershub.com"
   }
 }
 ```

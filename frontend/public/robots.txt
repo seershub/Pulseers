@@ -2,4 +2,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://your-domain.vercel.app/sitemap.xml
+Sitemap: https://pulseers.seershub.com/sitemap.xml
