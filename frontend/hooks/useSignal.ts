@@ -65,6 +65,14 @@ export function useSignal() {
 
       console.log("👤 Using account:", accountToUse);
 
+      // Verify we're on Base Mainnet
+      const chainId = await clientToUse.getChainId();
+      console.log("🔗 Chain ID:", chainId, "(should be 8453 for Base Mainnet)");
+
+      if (chainId !== 8453) {
+        throw new Error(`Wrong network! Please switch to Base Mainnet (Chain ID: 8453). Current: ${chainId}`);
+      }
+
       const contractAddress = getContractAddress();
       console.log("📝 Contract:", contractAddress);
 
@@ -72,32 +80,38 @@ export function useSignal() {
         throw new Error("Public client not available");
       }
 
-      // Simulate transaction first
-      console.log("🔍 Simulating transaction...");
-      const { request } = await publicClient.simulateContract({
+      // Verify publicClient is also on Base Mainnet
+      const publicChainId = await publicClient.getChainId();
+      console.log("🔗 Public client Chain ID:", publicChainId);
+
+      // Send transaction directly without simulation
+      console.log("📤 Sending transaction to Base Mainnet...");
+
+      const txHash = await clientToUse.writeContract({
         address: contractAddress,
         abi: PULSEERS_ABI,
         functionName: "signal",
         args: [matchId, teamId],
         account: accountToUse,
+        chain: base,
       });
 
-      console.log("✅ Simulation successful, sending transaction...");
-
-      // Send transaction
-      const txHash = await clientToUse.writeContract(request);
-
-      console.log("📤 Transaction sent:", txHash);
+      console.log("✅ Transaction sent successfully!");
+      console.log("📤 TX Hash:", txHash);
+      console.log("🔍 View on BaseScan: https://basescan.org/tx/" + txHash);
       setHash(txHash);
 
       // Wait for confirmation
-      console.log("⏳ Waiting for confirmation...");
+      console.log("⏳ Waiting for confirmation on Base Mainnet...");
       const receipt = await publicClient.waitForTransactionReceipt({
         hash: txHash,
         confirmations: 1,
+        timeout: 60_000, // 60 seconds timeout
       });
 
-      console.log("✅ Transaction confirmed:", receipt);
+      console.log("✅ Transaction confirmed!");
+      console.log("📋 Receipt:", receipt);
+      console.log("🔍 BaseScan: https://basescan.org/tx/" + txHash);
 
       setIsSuccess(true);
       setIsPending(false);
@@ -105,6 +119,11 @@ export function useSignal() {
       return txHash;
     } catch (err: any) {
       console.error("❌ Signal error:", err);
+      console.error("❌ Error details:", {
+        message: err.message,
+        code: err.code,
+        data: err.data,
+      });
       setError(err);
       setIsPending(false);
       setIsSuccess(false);
