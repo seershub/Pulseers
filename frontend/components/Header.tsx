@@ -91,10 +91,15 @@ export function Header() {
                 <span className="text-sm font-semibold text-blue-700 font-mono">
                   {formatAddress(address)}
                 </span>
+                {/* In browser, show ConnectWallet dropdown for disconnect */}
+                {/* In Farcaster/BaseApp, wallet is auto-connected and cannot be disconnected */}
+                {!isFarcasterAvailable && (
+                  <ConnectWallet />
+                )}
               </div>
             )}
-            {/* ConnectWallet only shows in browser, never in Farcaster/BaseApp */}
-            <ConnectWallet />
+            {/* ConnectWallet only shows in browser when not connected */}
+            {!isConnected && <ConnectWallet />}
           </div>
         </div>
 

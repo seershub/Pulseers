@@ -22,6 +22,7 @@ export function MatchCard({ match, index }: MatchCardProps) {
   const { signal, isPending, isSuccess } = useSignal();
   const { hasSignaled, teamChoice, refetch } = useUserSignal(match.matchId);
   const [selectedTeam, setSelectedTeam] = useState<1 | 2 | null>(null);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   // Wallet is automatically detected by useWallet hook
   const walletConnected = isConnected;
@@ -37,21 +38,40 @@ export function MatchCard({ match, index }: MatchCardProps) {
       return;
     }
 
+    // CRITICAL: Prevent multiple signals - check if already signaled
     if (hasSignaled) {
-      alert("You have already signaled for this match");
+      alert("You have already signaled for this match. You can only signal once per match.");
+      return;
+    }
+
+    // CRITICAL: Prevent signaling if already pending (double-click protection)
+    if (isPending) {
       return;
     }
 
     setSelectedTeam(teamId);
 
     try {
-      await signal(match.matchId, teamId);
+      const txHash = await signal(match.matchId, teamId);
+      console.log("✅ Signal successful, txHash:", txHash);
+      
+      // Show success popup immediately
+      setShowSuccess(true);
+      
+      // Wait a bit for transaction to be indexed
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Refetch to update hasSignaled state
+      await refetch();
+      
+      // Hide success popup after 3 seconds
       setTimeout(() => {
-        refetch();
+        setShowSuccess(false);
         setSelectedTeam(null);
       }, 3000);
     } catch (error: any) {
       console.error("Signal error:", error);
+      setShowSuccess(false);
       alert(error.message || "Failed to submit signal");
       setSelectedTeam(null);
     }
@@ -189,13 +209,14 @@ export function MatchCard({ match, index }: MatchCardProps) {
       </div>
 
       {/* Signal Buttons - Compact */}
+      {/* CRITICAL: Only show buttons if NOT already signaled and wallet is connected */}
       {isActive && !hasSignaled && walletConnected && (
         <div className="grid grid-cols-2 gap-3">
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => handleSignal(1)}
-            disabled={isPending}
+            disabled={isPending || hasSignaled}
             className={cn(
               "relative overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed",
               {
@@ -208,7 +229,7 @@ export function MatchCard({ match, index }: MatchCardProps) {
             ) : (
               <div className="flex items-center justify-center gap-2">
                 <TrendingUp className="w-4 h-4" />
-                <span className="text-sm">Signal</span>
+                <span className="text-sm">Signal {match.teamA}</span>
               </div>
             )}
           </motion.button>
@@ -217,7 +238,7 @@ export function MatchCard({ match, index }: MatchCardProps) {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => handleSignal(2)}
-            disabled={isPending}
+            disabled={isPending || hasSignaled}
             className={cn(
               "relative overflow-hidden bg-gradient-to-br from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed",
               {
@@ -230,7 +251,7 @@ export function MatchCard({ match, index }: MatchCardProps) {
             ) : (
               <div className="flex items-center justify-center gap-2">
                 <TrendingUp className="w-4 h-4" />
-                <span className="text-sm">Signal</span>
+                <span className="text-sm">Signal {match.teamB}</span>
               </div>
             )}
           </motion.button>
@@ -254,24 +275,56 @@ export function MatchCard({ match, index }: MatchCardProps) {
         </div>
       )}
 
-      {/* Success Animation */}
-      {isSuccess && selectedTeam && (
+      {/* Success Animation - Show for 3 seconds */}
+      {(showSuccess || (isSuccess && selectedTeam)) && (
         <motion.div
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="absolute inset-0 flex items-center justify-center bg-blue-500/10 backdrop-blur-sm rounded-3xl"
+          exit={{ scale: 0, opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+          onClick={() => setSelectedTeam(null)}
         >
-          <div className="glass-card p-8">
+          <motion.div
+            initial={{ scale: 0.8, y: 20 }}
+            animate={{ scale: 1, y: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            className="glass-card p-8 max-w-md mx-4 shadow-2xl border-2 border-green-200 bg-gradient-to-br from-white to-green-50/30"
+            onClick={(e) => e.stopPropagation()}
+          >
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: [0, 1.2, 1] }}
-              transition={{ duration: 0.5 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="mb-4"
             >
-              <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto mb-4" />
+              <CheckCircle2 className="w-20 h-20 text-green-500 mx-auto drop-shadow-lg" />
             </motion.div>
-            <p className="text-lg font-bold text-gray-900">Signal Recorded!</p>
-            <p className="text-sm text-gray-600 mt-1">Transaction confirmed on Base</p>
-          </div>
+            <motion.h3
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="text-2xl font-black gradient-text text-center mb-2"
+            >
+              Signal Recorded!
+            </motion.h3>
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4 }}
+              className="text-sm text-gray-600 text-center mb-2"
+            >
+              You signaled for {selectedTeam === 1 ? match.teamA : match.teamB}
+            </motion.p>
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="text-xs text-gray-500 text-center"
+            >
+              Transaction confirmed on Base Mainnet
+            </motion.p>
+          </motion.div>
         </motion.div>
       )}
     </motion.div>

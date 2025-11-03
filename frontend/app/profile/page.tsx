@@ -52,45 +52,65 @@ export default function ProfilePage() {
       <Header />
       <div className="flex-1 py-12 px-4">
         <div className="container mx-auto max-w-6xl">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card rounded-3xl p-8 mb-8">
-          <div className="flex flex-col md:flex-row items-center gap-6">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }} 
+          animate={{ opacity: 1, y: 0 }} 
+          className="glass-card rounded-3xl p-8 mb-8 shadow-xl border border-blue-100/50 bg-gradient-to-br from-white via-blue-50/30 to-white overflow-hidden relative"
+        >
+          {/* Decorative Background Elements */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-blue-200/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-200/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+          
+          <div className="relative z-10 flex flex-col md:flex-row items-center gap-6">
             {/* Profile Picture */}
-            {farcasterUser?.pfpUrl ? (
-              <Image
-                src={farcasterUser.pfpUrl}
-                alt={farcasterUser.displayName || "Profile"}
-                className="w-24 h-24 rounded-full shadow-xl border-4 border-blue-100"
-                width={96}
-                height={96}
-              />
-            ) : (
-              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white text-3xl font-black shadow-xl">
-                {address ? address.slice(2, 4).toUpperCase() : <UserIcon className="w-12 h-12" />}
-              </div>
-            )}
+            <div className="relative">
+              {farcasterUser?.pfpUrl ? (
+                <div className="relative">
+                  <Image
+                    src={farcasterUser.pfpUrl}
+                    alt={farcasterUser.displayName || "Profile"}
+                    className="w-28 h-28 rounded-full shadow-2xl border-4 border-white ring-4 ring-blue-100"
+                    width={112}
+                    height={112}
+                  />
+                  <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-green-500 rounded-full border-4 border-white shadow-lg" />
+                </div>
+              ) : (
+                <div className="w-28 h-28 rounded-full bg-gradient-to-br from-blue-500 via-blue-600 to-purple-600 flex items-center justify-center text-white text-3xl font-black shadow-2xl ring-4 ring-blue-100">
+                  {address ? address.slice(2, 4).toUpperCase() : <UserIcon className="w-14 h-14" />}
+                </div>
+              )}
+            </div>
 
-            <div className="flex-1 text-center md:text-left">
+            <div className="flex-1 text-center md:text-left min-w-0">
               {/* Display Name or "Your Profile" */}
-              <h1 className="text-3xl font-black gradient-text mb-2">
+              <h1 className="text-3xl md:text-4xl font-black gradient-text mb-2 break-words">
                 {farcasterUser?.displayName || "Your Profile"}
               </h1>
 
               {/* Username if available */}
               {farcasterUser?.username && (
-                <p className="text-lg text-blue-600 font-semibold mb-1">
+                <p className="text-lg text-blue-600 font-semibold mb-2 break-words">
                   @{farcasterUser.username}
                 </p>
               )}
 
               {/* FID if in Mini App */}
               {farcasterUser?.fid && (
-                <p className="text-sm text-gray-500 mb-2">
+                <p className="text-sm text-gray-500 mb-3">
                   FID: {farcasterUser.fid}
                 </p>
               )}
 
-              {/* Wallet Address */}
-              <p className="text-gray-600 font-mono text-sm">{address}</p>
+              {/* Wallet Address - Better formatted with no overflow */}
+              {address && (
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-xl border border-blue-200 mb-3 max-w-full">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse flex-shrink-0" />
+                  <p className="text-gray-700 font-mono text-xs break-all">
+                    {address.slice(0, 6)}...{address.slice(-4)}
+                  </p>
+                </div>
+              )}
 
               <div className="mt-4 flex flex-wrap gap-2 justify-center md:justify-start">
                 <div className="badge badge-primary">
