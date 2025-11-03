@@ -13,32 +13,24 @@
   "miniapp": {
     "version": "1",
     "name": "Pulseers",
-    "author": "SeersHub",
-    "authorUrl": "https://warpcast.com/seershub",
-    "description": "Predict daily football match outcomes and compete on the leaderboard. Signal your support for your favorite teams on-chain.",
     "iconUrl": "https://pulseers.seershub.com/icon-1024.png",
     "homeUrl": "https://pulseers.seershub.com",
-    "imageUrl": "https://pulseers.seershub.com/icon-1024.png",
     "splashImageUrl": "https://pulseers.seershub.com/splash.png",
     "splashBackgroundColor": "#0052FF",
+    "webhookUrl": "https://pulseers.seershub.com/api/webhook",
     "subtitle": "Daily Football Predictions",
+    "description": "Predict daily football match outcomes and compete on the leaderboard. Signal your support for your favorite teams on-chain.",
+    "screenshotUrls": [
+      "https://pulseers.seershub.com/og-image.png",
+      "https://pulseers.seershub.com/hero.png"
+    ],
+    "primaryCategory": "social",
+    "tags": ["predictions", "competition", "base", "daily", "football"],
     "heroImageUrl": "https://pulseers.seershub.com/hero.png",
     "tagline": "Signal, Compete, Win",
     "ogTitle": "Pulseers - Football Predictions",
     "ogDescription": "Predict football matches daily on Base Mainnet and compete for prizes!",
     "ogImageUrl": "https://pulseers.seershub.com/og-image.png",
-    "castShareUrl": "https://pulseers.seershub.com",
-    "webhookUrl": "https://pulseers.seershub.com/api/webhook",
-    "primaryCategory": "social",
-    "tags": ["predictions", "competition", "base", "daily", "football"],
-    "screenshotUrls": [
-      "https://pulseers.seershub.com/og-image.png",
-      "https://pulseers.seershub.com/hero.png"
-    ],
     "noindex": false
-  },
-  "frame": {
-    "url": "https://pulseers.seershub.com",
-    "version": "vNext"
   }
 }

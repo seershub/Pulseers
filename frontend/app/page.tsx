@@ -57,12 +57,12 @@ export default function HomePage() {
           </p>
         </motion.div>
 
-        {/* Filter Tabs */}
+        {/* Filter Tabs - Grid Layout for Mobile */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="flex items-center justify-center gap-2 mb-8 overflow-x-auto pb-2"
+          className="grid grid-cols-2 md:flex md:items-center md:justify-center gap-2 mb-8 max-w-md mx-auto"
         >
           {filters.map((filter) => {
             const Icon = filter.icon;
@@ -70,14 +70,14 @@ export default function HomePage() {
               <button
                 key={filter.id}
                 onClick={() => setActiveFilter(filter.id)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold transition-all whitespace-nowrap ${
+                className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl font-semibold transition-all whitespace-nowrap text-sm ${
                   activeFilter === filter.id
                     ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30"
                     : "bg-white text-gray-600 hover:bg-blue-50 border border-gray-200"
                 }`}
               >
                 <Icon className="w-4 h-4" />
-                <span className="text-sm">{filter.label}</span>
+                <span>{filter.label}</span>
               </button>
             );
           })}

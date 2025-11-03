@@ -74,9 +74,12 @@
     }
   }
 
-  /* Match Card Hover Effect */
+  /* Match Card Hover Effect - Enhanced */
   .match-card {
-    @apply glass-card rounded-3xl p-6 transition-all duration-500 hover:shadow-2xl hover:shadow-blue-500/20 hover:-translate-y-1;
+    @apply glass-card rounded-3xl p-6 md:p-8 transition-all duration-500;
+    @apply border-2 border-blue-100/80;
+    @apply hover:shadow-2xl hover:shadow-blue-500/25 hover:-translate-y-2 hover:border-blue-200;
+    @apply cursor-pointer;
   }
 
   /* Shimmer Effect */
@@ -100,9 +103,9 @@
     }
   }
 
-  /* Team Badge */
+  /* Team Badge - Enhanced */
   .team-badge {
-    @apply w-16 h-16 rounded-2xl bg-white shadow-lg flex items-center justify-center p-2 transition-transform duration-300 hover:scale-110;
+    @apply w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-white shadow-xl border-2 border-blue-50 flex items-center justify-center p-2 transition-all duration-300 hover:scale-110 hover:shadow-2xl hover:border-blue-100;
   }
 
   /* Signal Bar */
@@ -114,9 +117,9 @@
     @apply h-full transition-all duration-1000 ease-out;
   }
 
-  /* Live Badge */
+  /* Live Badge - Enhanced */
   .live-badge {
-    @apply flex items-center gap-2 px-4 py-2 bg-red-50 border-2 border-red-500 rounded-full;
+    @apply flex items-center gap-2 px-4 py-2 bg-red-50 border-2 border-red-500 rounded-full shadow-lg;
     animation: live-pulse 2s ease-in-out infinite;
   }
 
@@ -144,17 +147,17 @@
     @apply bg-white/90 backdrop-blur-xl border-b border-blue-100/50 shadow-sm;
   }
 
-  /* Badge */
+  /* Badge - Enhanced */
   .badge {
-    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold;
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold shadow-md;
   }
 
   .badge-primary {
-    @apply bg-blue-100 text-blue-700 border border-blue-200;
+    @apply bg-blue-100 text-blue-700 border-2 border-blue-200;
   }
 
   .badge-success {
-    @apply bg-green-100 text-green-700 border border-green-200;
+    @apply bg-green-100 text-green-700 border-2 border-green-200;
   }
 
   /* Floating Animation */
@@ -191,9 +194,9 @@
     @apply text-3xl font-bold bg-gradient-to-br from-blue-600 to-blue-500 bg-clip-text text-transparent;
   }
 
-  /* VS Badge */
+  /* VS Badge - Enhanced */
   .vs-badge {
-    @apply w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-black text-sm shadow-lg;
+    @apply w-12 h-12 md:w-14 md:h-14 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-black text-sm md:text-base shadow-xl border-2 border-white;
   }
 }
 
