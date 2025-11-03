@@ -48,27 +48,55 @@ export function useWallet() {
           setIsFarcasterAvailable(true);
           console.log("📱 Farcaster/BaseApp environment detected");
           
-          try {
-            // Get address from Farcaster wallet
-            if (sdk.wallet?.ethProvider) {
-              const walletClient = createWalletClient({
-                chain: base,
-                transport: custom(sdk.wallet.ethProvider),
-              });
+          // Set checking to false immediately so components can render
+          // Address will be loaded asynchronously
+          setIsChecking(false);
+          
+          // Get address from Farcaster wallet asynchronously
+          // This allows UI to render immediately
+          (async () => {
+            try {
+              // Retry logic for getting address
+              let retries = 3;
+              while (retries > 0) {
+                try {
+                  if (sdk.wallet?.ethProvider) {
+                    const walletClient = createWalletClient({
+                      chain: base,
+                      transport: custom(sdk.wallet.ethProvider),
+                    });
 
-              const [addr] = await walletClient.getAddresses();
-              if (addr) {
-                setFarcasterAddress(addr);
-                console.log("✅ Farcaster wallet address:", addr);
+                    const [addr] = await walletClient.getAddresses();
+                    if (addr) {
+                      setFarcasterAddress(addr);
+                      console.log("✅ Farcaster wallet address:", addr);
+                      return; // Success, exit retry loop
+                    }
+                  } else {
+                    // Wait a bit for wallet provider to be available
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    retries--;
+                    continue;
+                  }
+                } catch (err) {
+                  console.warn(`⚠️ Attempt ${4-retries} failed to get Farcaster wallet address:`, err);
+                  retries--;
+                  if (retries > 0) {
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                  }
+                }
               }
-            } else {
-              console.warn("⚠️ Farcaster environment detected but wallet provider not available");
+              
+              if (!farcasterAddress) {
+                console.warn("⚠️ Could not get Farcaster wallet address after retries");
+              }
+            } catch (err) {
+              console.error("❌ Error getting Farcaster wallet address:", err);
             }
-          } catch (err) {
-            console.warn("⚠️ Could not get Farcaster wallet address:", err);
-          }
+          })();
         } else {
           setIsFarcasterAvailable(false);
+          setIsChecking(false);
           console.log("🌐 Browser environment detected");
         }
       } catch (error) {
@@ -84,8 +112,10 @@ export function useWallet() {
   }, []);
 
   // Determine active wallet
+  // CRITICAL: If Farcaster environment is detected, consider connected even if address not yet loaded
+  // This allows Profile/History pages to open immediately in Farcaster/BaseApp
   const address = farcasterAddress || wagmiAddress || null;
-  const isConnected = !!address;
+  const isConnected = !!address || (isFarcasterAvailable && !isChecking); // Optimistic connection for Farcaster
   const isFarcaster = !!farcasterAddress;
 
   return {

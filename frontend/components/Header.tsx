@@ -8,8 +8,11 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 
 export function Header() {
-  const { address, isConnected } = useWallet();
+  const { address, isConnected, isFarcasterAvailable, isChecking } = useWallet();
   const pathname = usePathname();
+  
+  // In Farcaster/BaseApp, show navigation even while address is loading
+  const showNavigation = isConnected || (isFarcasterAvailable && !isChecking);
 
   const formatAddress = (addr: string) => {
     return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
@@ -48,7 +51,7 @@ export function Header() {
             >
               Matches
             </Link>
-            {isConnected && (
+            {showNavigation && (
               <>
                 <Link
                   href="/profile"
@@ -96,7 +99,7 @@ export function Header() {
         </div>
 
         {/* Mobile Navigation - Compact Icon-Based */}
-        {isConnected && (
+        {showNavigation && (
           <nav className="md:hidden flex items-center justify-center gap-1 mt-3">
             <Link
               href="/"

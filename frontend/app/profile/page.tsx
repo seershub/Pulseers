@@ -29,8 +29,11 @@ export default function ProfilePage() {
     loadFarcasterData();
   }, []);
 
-  // Show loading state while checking wallet
-  if (isChecking) {
+  // In Farcaster/BaseApp, show page immediately even if address is still loading
+  // Only show loading in browser if no wallet is connected
+  const showLoading = isChecking && !isConnected;
+  
+  if (showLoading) {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
