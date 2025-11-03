@@ -4,12 +4,42 @@
     "payload": "eyJkb21haW4iOiJwdWxzZWVycy5zZWVyc2h1Yi5jb20ifQ",
     "signature": "vQzqRGfQfXvHKnX3thoqXZ41Jv7EJMskR8gafea4qeNi2ZP9cTGHF9y7Ed8rKzBJtNeRNmn4+Sr0OJ1DQvFqFhw="
   },
-  "frame": {
+  "baseBuilder": {
+    "ownerAddress": "0x2F8b89f74C0540B638CF808515dFabe565796aAA",
+    "allowedAddresses": [
+      "0x2F8b89f74C0540B638CF808515dFabe565796aAA"
+    ]
+  },
+  "miniapp": {
     "version": "1",
     "name": "Pulseers",
-    "iconUrl": "https://pulseers.seershub.com/icon-512x512.png",
+    "author": "SeersHub",
+    "authorUrl": "https://warpcast.com/seershub",
+    "description": "Predict daily football match outcomes and compete on the leaderboard. Signal your support for your favorite teams on-chain.",
+    "iconUrl": "https://pulseers.seershub.com/icon-1024.png",
+    "homeUrl": "https://pulseers.seershub.com",
+    "imageUrl": "https://pulseers.seershub.com/icon-1024.png",
     "splashImageUrl": "https://pulseers.seershub.com/splash.png",
-    "splashBackgroundColor": "#0A0F1E",
-    "homeUrl": "https://pulseers.seershub.com"
+    "splashBackgroundColor": "#0052FF",
+    "subtitle": "Daily Football Predictions",
+    "heroImageUrl": "https://pulseers.seershub.com/hero.png",
+    "tagline": "Signal, Compete, Win",
+    "ogTitle": "Pulseers - Football Predictions",
+    "ogDescription": "Predict football matches daily on Base Mainnet and compete for prizes!",
+    "ogImageUrl": "https://pulseers.seershub.com/og-image.png",
+    "castShareUrl": "https://pulseers.seershub.com",
+    "webhookUrl": "https://pulseers.seershub.com/api/webhook",
+    "license": "MIT",
+    "tags": ["sports", "predictions", "competition", "base", "daily"],
+    "screenshotUrls": [
+      "https://pulseers.seershub.com/og-image.png",
+      "https://pulseers.seershub.com/hero.png"
+    ],
+    "noindex": false,
+    "primaryCategory": "social"
+  },
+  "frame": {
+    "url": "https://pulseers.seershub.com",
+    "version": "vNext"
   }
 }

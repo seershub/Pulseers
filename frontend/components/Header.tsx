@@ -2,8 +2,9 @@
 
 import { useAccount } from "wagmi";
 import { ConnectWallet } from "./ConnectWallet";
-import { Trophy, User, History } from "lucide-react";
+import { User, History } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 
 export function Header() {
@@ -19,13 +20,19 @@ export function Header() {
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-blue-500 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-              <Trophy className="w-6 h-6 text-white" />
+          <Link href="/" className="flex items-center gap-2 group">
+            <div className="relative w-10 h-10 rounded-xl overflow-hidden shadow-lg group-hover:scale-110 transition-transform">
+              <Image
+                src="/icon-512.png"
+                alt="Pulseers Logo"
+                width={40}
+                height={40}
+                className="object-contain"
+              />
             </div>
             <div>
               <h1 className="text-xl font-black gradient-text">Pulseers</h1>
-              <p className="text-xs text-gray-500">Signal Your Team</p>
+              <p className="text-xs text-gray-500 font-medium">Signal Your Team</p>
             </div>
           </Link>
 
