@@ -3,9 +3,11 @@
 import { useEffect, useState } from "react";
 import { Header } from "@/components/Header";
 import { MatchList } from "@/components/MatchList";
+import { PlayerCarousel } from "@/components/PlayerCarousel";
 import { motion } from "framer-motion";
 import { TrendingUp, Zap, CheckCircle, Trophy } from "lucide-react";
 import { sdk } from "@/lib/farcaster-sdk";
+import { useWallet } from "@/hooks/useWallet";
 
 /**
  * Main Page Component
@@ -13,6 +15,8 @@ import { sdk } from "@/lib/farcaster-sdk";
  */
 export default function HomePage() {
   const [activeFilter, setActiveFilter] = useState<"ALL" | "LIVE" | "UPCOMING" | "FINISHED">("ALL");
+  const { isConnected } = useWallet();
+  const [userSignaledPlayers, setUserSignaledPlayers] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     // Initialize Farcaster SDK
@@ -26,6 +30,62 @@ export default function HomePage() {
     }
     init();
   }, []);
+
+  // Mock player data - Replace with real data from API/contract
+  const bestPlayers = [
+    {
+      id: "player-1",
+      name: "Cristiano Ronaldo",
+      position: "FW",
+      team: "Al Nassr",
+      image: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&h=400&fit=crop",
+      signalCount: 1247,
+    },
+    {
+      id: "player-2",
+      name: "Lionel Messi",
+      position: "FW",
+      team: "Inter Miami",
+      image: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&h=400&fit=crop",
+      signalCount: 1156,
+    },
+    {
+      id: "player-3",
+      name: "Kylian Mbappé",
+      position: "FW",
+      team: "Paris Saint-Germain",
+      image: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&h=400&fit=crop",
+      signalCount: 987,
+    },
+    {
+      id: "player-4",
+      name: "Erling Haaland",
+      position: "FW",
+      team: "Manchester City",
+      image: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&h=400&fit=crop",
+      signalCount: 856,
+    },
+  ];
+
+  const handlePlayerSignal = async (playerId: string) => {
+    // TODO: Contract currently only supports match signaling, not player signaling
+    // To implement player signals, the contract needs to be extended with:
+    // - playerId mapping
+    // - userPlayerSignals mapping
+    // - signalPlayer(uint256 playerId) function
+    // For now, this is a mock implementation that updates local state only
+    
+    console.log("🎯 Signaling player:", playerId);
+    
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Update local state (mock - not persisted on-chain)
+    setUserSignaledPlayers(prev => new Set(prev).add(playerId));
+    
+    // TODO: Implement on-chain player signal when contract is extended
+    // Example: await writeContract({ ...config, functionName: 'signalPlayer', args: [playerId] });
+  };
 
   const filters = [
     { id: "ALL" as const, label: "All Matches", icon: Trophy },
@@ -221,16 +281,37 @@ export default function HomePage() {
               </section>
 
               {/* Finished Matches */}
-              <section>
+              <section className="mb-10">
                 <h2 className="text-xl font-black mb-4 flex items-center gap-2">
                   <CheckCircle className="w-5 h-5 text-gray-400" />
                   <span className="text-gray-600">Finished</span>
                 </h2>
                 <MatchList status="FINISHED" />
               </section>
+
+              {/* Signal Best Players Section */}
+              <section className="mb-10">
+                <PlayerCarousel
+                  players={bestPlayers}
+                  onPlayerSignal={handlePlayerSignal}
+                  userSignaledPlayers={userSignaledPlayers}
+                />
+              </section>
             </>
           ) : (
-            <MatchList status={activeFilter} />
+            <>
+              <MatchList status={activeFilter} />
+              {/* Show players section even when filtered */}
+              {activeFilter === "ALL" || activeFilter === "LIVE" ? (
+                <section className="mt-10">
+                  <PlayerCarousel
+                    players={bestPlayers}
+                    onPlayerSignal={handlePlayerSignal}
+                    userSignaledPlayers={userSignaledPlayers}
+                  />
+                </section>
+              ) : null}
+            </>
           )}
         </motion.div>
       </main>
