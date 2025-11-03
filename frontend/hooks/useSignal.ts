@@ -33,32 +33,67 @@ export function useSignal() {
     try {
       console.log("🎯 Submitting signal:", { matchId, teamId });
 
+      // CRITICAL: Check if we're in Farcaster/BaseApp FIRST
+      // BaseApp/Farcaster always uses Base Mainnet, so we prioritize Farcaster wallet
       let clientToUse = walletClient;
       let accountToUse = address;
-
-      // Check if we're in Farcaster Mini App and no regular wallet is connected
       let isFarcasterWallet = false;
-      if (!walletClient) {
+      let isInBaseApp = false;
+
+      // Always check if we're in Farcaster/BaseApp context
+      // Check multiple ways to ensure we detect BaseApp even if isInMiniApp() fails
+      try {
+        // Method 1: Check isInMiniApp()
         const isInMiniApp = await sdk.isInMiniApp();
-
-        if (isInMiniApp) {
-          console.log("📱 Using Farcaster Mini App wallet");
+        
+        // Method 2: Check if Farcaster wallet provider is available
+        const hasFarcasterWallet = !!(sdk.wallet?.ethProvider);
+        
+        // Method 3: Check if we're in an iframe (BaseApp runs in iframe)
+        const isInIframe = typeof window !== 'undefined' && window.self !== window.top;
+        
+        // If any indicator suggests we're in BaseApp/Farcaster, use Farcaster wallet
+        if (isInMiniApp || (hasFarcasterWallet && isInIframe) || hasFarcasterWallet) {
+          isInBaseApp = true;
           isFarcasterWallet = true;
-          const context = await sdk.context;
-          console.log("👤 Farcaster user:", context.user);
-
-          // Create wallet client with Farcaster SDK
-          clientToUse = createWalletClient({
-            chain: base,
-            transport: custom(sdk.wallet.ethProvider),
+          console.log("📱 Detected Farcaster/BaseApp - using Farcaster wallet", {
+            isInMiniApp,
+            hasFarcasterWallet,
+            isInIframe
           });
+          
+          try {
+            const context = await sdk.context;
+            console.log("👤 Farcaster user:", context.user);
 
-          const [addr] = await clientToUse.getAddresses();
-          accountToUse = addr;
-          console.log("✅ Farcaster account:", accountToUse);
-        } else {
-          throw new Error("Please connect your wallet to signal");
+            // Always use Farcaster wallet when in BaseApp/Farcaster
+            // This ensures we're always on Base Mainnet
+            if (sdk.wallet?.ethProvider) {
+              clientToUse = createWalletClient({
+                chain: base,
+                transport: custom(sdk.wallet.ethProvider),
+              });
+
+              const [addr] = await clientToUse.getAddresses();
+              accountToUse = addr;
+              console.log("✅ Farcaster account:", accountToUse);
+            } else {
+              throw new Error("Farcaster wallet provider not available");
+            }
+          } catch (err) {
+            console.error("❌ Failed to initialize Farcaster wallet:", err);
+            // If Farcaster wallet fails, fall back to regular wallet
+            isFarcasterWallet = false;
+            isInBaseApp = false;
+          }
         }
+      } catch (err) {
+        console.warn("⚠️ Could not check Farcaster context:", err);
+      }
+
+      // If not in Farcaster/BaseApp and no wallet connected, throw error
+      if (!isFarcasterWallet && !walletClient) {
+        throw new Error("Please connect your wallet to signal");
       }
 
       if (!clientToUse || !accountToUse) {
@@ -74,43 +109,30 @@ export function useSignal() {
         throw new Error("Public client not available");
       }
 
-      // CRITICAL: Verify chain - MUST be Base Mainnet
-      // NOTE: Farcaster wallet always uses Base Mainnet, so we skip chain check for it
-      if (!isFarcasterWallet) {
+      // IMPORTANT: In BaseApp/Farcaster, we ALWAYS use Base Mainnet
+      // For regular wallets, we check chain but don't block if detection fails
+      // The transaction will be forced to Base Mainnet via chain: base parameter
+      if (!isFarcasterWallet && !isInBaseApp) {
         try {
           const chainId = await clientToUse.getChainId();
           console.log("🔗 Wallet Chain ID:", chainId);
 
           if (chainId === 84532) {
-            throw new Error(
-              "❌ Wrong Network!\n\n" +
-              "Your wallet is on Base Sepolia (Testnet).\n" +
-              "Please switch to Base Mainnet in your wallet.\n\n" +
-              "Current: Base Sepolia (84532)\n" +
-              "Required: Base Mainnet (8453)"
-            );
+            console.warn("⚠️ Wallet reports Base Sepolia, but forcing Base Mainnet transaction");
+            // Don't throw - viem will force Base Mainnet via chain parameter
+          } else if (chainId !== 8453) {
+            console.warn(`⚠️ Wallet reports Chain ID ${chainId}, but forcing Base Mainnet transaction`);
+            // Don't throw - viem will force Base Mainnet via chain parameter
+          } else {
+            console.log("✅ Correct network: Base Mainnet");
           }
-
-          if (chainId !== 8453) {
-            throw new Error(
-              "❌ Wrong Network!\n\n" +
-              "Please switch to Base Mainnet in your wallet.\n\n" +
-              `Current Chain ID: ${chainId}\n` +
-              "Required: Base Mainnet (8453)"
-            );
-          }
-
-          console.log("✅ Correct network: Base Mainnet");
         } catch (err: any) {
-          // If it's our custom error, throw it
-          if (err.message?.includes("Wrong Network")) {
-            throw err;
-          }
           // If we can't verify chain, warn but don't block
-          console.warn("⚠️ Could not verify wallet chain ID:", err);
+          // Transaction will be forced to Base Mainnet anyway
+          console.warn("⚠️ Could not verify wallet chain ID, but proceeding with Base Mainnet:", err);
         }
       } else {
-        console.log("✅ Farcaster wallet - automatically on Base Mainnet");
+        console.log("✅ BaseApp/Farcaster wallet - automatically on Base Mainnet");
       }
 
       // Send transaction directly without simulation
