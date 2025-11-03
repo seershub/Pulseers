@@ -5,10 +5,11 @@ import { createPublicClient, createWalletClient, custom, http } from "viem";
 import { base } from "viem/chains";
 import { getContractAddress } from "@/lib/viem-config";
 import { PULSEERS_ABI } from "@/lib/contracts";
+import { sdk } from "@/lib/farcaster-sdk";
 
 /**
- * Hook to handle signaling with MiniKit SDK (Pattern from SeersLeague)
- * Uses direct Viem instead of Wagmi for better Mini App compatibility
+ * Hook to handle signaling with Farcaster SDK (Pattern from SeersLeague)
+ * Uses direct Viem + Farcaster SDK for Mini App compatibility
  */
 export function useSignal() {
   const [isPending, setIsPending] = useState(false);
@@ -24,36 +25,48 @@ export function useSignal() {
     try {
       console.log("🎯 Submitting signal:", { matchId, teamId });
 
-      // Check if we're in MiniKit environment
-      const minikit = typeof window !== "undefined" ? (window as any).minikit : null;
-
       let walletClient;
+      let account: `0x${string}` | undefined;
 
-      if (minikit?.wallet?.ethProvider) {
-        // Use MiniKit wallet
-        console.log("📱 Using MiniKit wallet");
+      // Check if we're in Farcaster Mini App
+      const isInMiniApp = await sdk.isInMiniApp();
+
+      if (isInMiniApp) {
+        // Use Farcaster SDK wallet
+        console.log("📱 Running in Farcaster Mini App");
+
+        const context = await sdk.context;
+        console.log("👤 User context:", context.user);
+
+        // Create wallet client with Farcaster wallet provider
         walletClient = createWalletClient({
           chain: base,
-          transport: custom(minikit.wallet.ethProvider),
+          transport: custom(sdk.wallet.ethProvider),
         });
+
+        // Get account from wallet
+        const [addr] = await walletClient.getAddresses();
+        account = addr;
+        console.log("✅ Account from Farcaster wallet:", account);
       } else if (typeof window !== "undefined" && (window as any).ethereum) {
-        // Fallback to injected wallet
+        // Fallback to injected wallet (MetaMask, etc.)
         console.log("🦊 Using injected wallet");
         walletClient = createWalletClient({
           chain: base,
           transport: custom((window as any).ethereum),
         });
-      } else {
-        throw new Error("No wallet found. Please connect your wallet.");
-      }
 
-      const [account] = await walletClient.getAddresses();
+        const [addr] = await walletClient.getAddresses();
+        account = addr;
+      } else {
+        throw new Error("No wallet found. Please connect your wallet or open in Farcaster Mini App.");
+      }
 
       if (!account) {
         throw new Error("No account found. Please connect your wallet.");
       }
 
-      console.log("👤 Account:", account);
+      console.log("👤 Using account:", account);
 
       const contractAddress = getContractAddress();
       console.log("📝 Contract:", contractAddress);

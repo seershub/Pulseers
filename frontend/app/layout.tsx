@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Pulseers - Signal Your Team",
@@ -40,10 +37,28 @@ export const metadata: Metadata = {
     images: ["/og-image.png"],
   },
   other: {
-    // Farcaster Frame metadata
+    // Farcaster Mini App metadata
+    "fc:miniapp": JSON.stringify({
+      version: "next",
+      name: "Pulseers",
+      description: "Signal your support for football teams on-chain",
+      iconUrl: `${process.env.NEXT_PUBLIC_URL || "https://pulseers.vercel.app"}/icon-192x192.png`,
+      imageUrl: `${process.env.NEXT_PUBLIC_URL || "https://pulseers.vercel.app"}/og-image.png`,
+      splashImageUrl: `${process.env.NEXT_PUBLIC_URL || "https://pulseers.vercel.app"}/splash.png`,
+      splashBackgroundColor: "#0052FF",
+      button: {
+        title: "Signal Your Team",
+        action: {
+          type: "launch_frame",
+          url: process.env.NEXT_PUBLIC_URL || "https://pulseers.vercel.app"
+        }
+      },
+      homeUrl: process.env.NEXT_PUBLIC_URL || "https://pulseers.vercel.app"
+    }),
+    // Farcaster Frame metadata (fallback)
     "fc:frame": "vNext",
     "fc:frame:image": `${process.env.NEXT_PUBLIC_URL || "https://pulseers.vercel.app"}/og-image.png`,
-    "fc:frame:button:1": "View Matches",
+    "fc:frame:button:1": "Launch App",
     "fc:frame:button:1:action": "link",
     "fc:frame:button:1:target": process.env.NEXT_PUBLIC_URL || "https://pulseers.vercel.app",
   },
@@ -56,7 +71,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body>
         <Providers>{children}</Providers>
       </body>
     </html>

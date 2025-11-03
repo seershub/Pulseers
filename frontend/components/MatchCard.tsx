@@ -9,7 +9,7 @@ import { formatMatchDate } from "@/lib/utils";
 import { Trophy, CalendarDays, TrendingUp, Users, CheckCircle2, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
-import Image from "next/image";
+import { AnimatedSignalBar } from "./AnimatedSignalBar";
 
 interface MatchCardProps {
   match: MatchWithStatus;
@@ -159,18 +159,22 @@ export function MatchCard({ match, index }: MatchCardProps) {
         </div>
       </div>
 
-      {/* Signal Percentage Bar */}
-      <div className="mb-6">
-        <div className="flex justify-between mb-2">
-          <span className="text-2xl font-black text-blue-600">{match.percentageA}%</span>
-          <span className="text-2xl font-black text-blue-600">{match.percentageB}%</span>
+      {/* Animated Signal Bar - Primary Focus */}
+      <div className="mb-8 p-6 bg-gradient-to-br from-blue-50 to-white rounded-2xl border-2 border-blue-100">
+        <div className="flex items-center justify-center gap-2 mb-4">
+          <TrendingUp className="w-5 h-5 text-blue-600" />
+          <h3 className="text-lg font-black text-gray-900">Community Signals</h3>
         </div>
-        <div className="signal-bar">
-          <motion.div
-            className="signal-bar-fill bg-gradient-to-r from-blue-600 to-blue-500"
-            initial={{ width: 0 }}
-            animate={{ width: `${match.percentageA}%` }}
-          />
+        <AnimatedSignalBar
+          percentageA={match.percentageA}
+          percentageB={match.percentageB}
+          teamAColor="#0052FF"
+          teamBColor="#1A6AFF"
+          isLive={isLive}
+        />
+        <div className="flex justify-between mt-4 text-xs text-gray-500">
+          <span>{match.signalsTeamA.toString()} signals</span>
+          <span>{match.signalsTeamB.toString()} signals</span>
         </div>
       </div>
 
