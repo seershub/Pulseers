@@ -3,28 +3,28 @@ import "./globals.css";
 import { Providers } from "./providers";
 
 export const metadata: Metadata = {
-  title: "Pulseers - Signal Your Team",
+  title: "Pulseers - Daily Football Predictions",
   description:
-    "Decentralized social signaling platform for football matches. Signal your support on-chain.",
+    "Predict daily football match outcomes and compete on the leaderboard. Signal your support for your favorite teams on-chain.",
   manifest: "/manifest.json",
   icons: {
     icon: [
-      { url: "/icon-192x192.png", sizes: "192x192", type: "image/png" },
-      { url: "/icon-512x512.png", sizes: "512x512", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+      { url: "/icon-1024.png", sizes: "1024x1024", type: "image/png" },
     ],
-    apple: [{ url: "/icon-512x512.png", sizes: "512x512", type: "image/png" }],
+    apple: [{ url: "/icon-1024.png", sizes: "1024x1024", type: "image/png" }],
   },
   openGraph: {
-    title: "Pulseers",
-    description: "Signal your support for football teams on-chain",
-    url: process.env.NEXT_PUBLIC_URL || "https://pulseers.vercel.app",
+    title: "Pulseers - Football Predictions",
+    description: "Predict football matches daily on Base Mainnet and compete for prizes!",
+    url: "https://pulseers.seershub.com",
     siteName: "Pulseers",
     images: [
       {
-        url: "/og-image.png",
+        url: "https://pulseers.seershub.com/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Pulseers - Signal Your Team",
+        alt: "Pulseers - Football Predictions",
       },
     ],
     locale: "en_US",
@@ -32,35 +32,26 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Pulseers",
-    description: "Signal your support for football teams on-chain",
-    images: ["/og-image.png"],
+    title: "Pulseers - Football Predictions",
+    description: "Predict football matches daily on Base Mainnet and compete for prizes!",
+    images: ["https://pulseers.seershub.com/og-image.png"],
   },
   other: {
-    // Farcaster Mini App metadata
+    // Farcaster Mini App embed metadata
     "fc:miniapp": JSON.stringify({
       version: "next",
-      name: "Pulseers",
-      description: "Signal your support for football teams on-chain",
-      iconUrl: `${process.env.NEXT_PUBLIC_URL || "https://pulseers.vercel.app"}/icon-192x192.png`,
-      imageUrl: `${process.env.NEXT_PUBLIC_URL || "https://pulseers.vercel.app"}/og-image.png`,
-      splashImageUrl: `${process.env.NEXT_PUBLIC_URL || "https://pulseers.vercel.app"}/splash.png`,
-      splashBackgroundColor: "#0052FF",
+      imageUrl: "https://pulseers.seershub.com/hero.png",
       button: {
-        title: "Signal Your Team",
+        title: "Launch Pulseers",
         action: {
-          type: "launch_frame",
-          url: process.env.NEXT_PUBLIC_URL || "https://pulseers.vercel.app"
+          type: "launch_miniapp",
+          name: "Pulseers",
+          url: "https://pulseers.seershub.com",
+          splashImageUrl: "https://pulseers.seershub.com/splash.png",
+          splashBackgroundColor: "#0052FF"
         }
-      },
-      homeUrl: process.env.NEXT_PUBLIC_URL || "https://pulseers.vercel.app"
+      }
     }),
-    // Farcaster Frame metadata (fallback)
-    "fc:frame": "vNext",
-    "fc:frame:image": `${process.env.NEXT_PUBLIC_URL || "https://pulseers.vercel.app"}/og-image.png`,
-    "fc:frame:button:1": "Launch App",
-    "fc:frame:button:1:action": "link",
-    "fc:frame:button:1:target": process.env.NEXT_PUBLIC_URL || "https://pulseers.vercel.app",
   },
 };
 

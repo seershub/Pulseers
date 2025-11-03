@@ -2,7 +2,7 @@
 
 import { useAccount } from "wagmi";
 import { ConnectWallet } from "./ConnectWallet";
-import { User, History } from "lucide-react";
+import { User, History, Trophy } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -94,37 +94,40 @@ export function Header() {
           </div>
         </div>
 
-        {/* Mobile Navigation */}
+        {/* Mobile Navigation - Compact Icon-Based */}
         {isConnected && (
-          <nav className="md:hidden flex items-center gap-2 mt-4 overflow-x-auto pb-2">
+          <nav className="md:hidden flex items-center justify-center gap-1 mt-3">
             <Link
               href="/"
-              className={`px-4 py-2 rounded-xl font-semibold whitespace-nowrap transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
                 pathname === "/"
-                  ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30"
-                  : "text-gray-600 bg-white"
+                  ? "bg-blue-600 text-white"
+                  : "text-gray-600 hover:bg-blue-50"
               }`}
             >
+              <Trophy className="w-3.5 h-3.5" />
               Matches
             </Link>
             <Link
               href="/profile"
-              className={`px-4 py-2 rounded-xl font-semibold whitespace-nowrap transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
                 pathname === "/profile"
-                  ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30"
-                  : "text-gray-600 bg-white"
+                  ? "bg-blue-600 text-white"
+                  : "text-gray-600 hover:bg-blue-50"
               }`}
             >
+              <User className="w-3.5 h-3.5" />
               Profile
             </Link>
             <Link
               href="/history"
-              className={`px-4 py-2 rounded-xl font-semibold whitespace-nowrap transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
                 pathname === "/history"
-                  ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30"
-                  : "text-gray-600 bg-white"
+                  ? "bg-blue-600 text-white"
+                  : "text-gray-600 hover:bg-blue-50"
               }`}
             >
+              <History className="w-3.5 h-3.5" />
               History
             </Link>
           </nav>

@@ -29,14 +29,13 @@
     "ogImageUrl": "https://pulseers.seershub.com/og-image.png",
     "castShareUrl": "https://pulseers.seershub.com",
     "webhookUrl": "https://pulseers.seershub.com/api/webhook",
-    "license": "MIT",
-    "tags": ["sports", "predictions", "competition", "base", "daily"],
+    "primaryCategory": "social",
+    "tags": ["predictions", "competition", "base", "daily", "football"],
     "screenshotUrls": [
       "https://pulseers.seershub.com/og-image.png",
       "https://pulseers.seershub.com/hero.png"
     ],
-    "noindex": false,
-    "primaryCategory": "social"
+    "noindex": false
   },
   "frame": {
     "url": "https://pulseers.seershub.com",
