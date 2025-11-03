@@ -2,29 +2,25 @@
 
 import { motion } from "framer-motion";
 import { MatchWithStatus } from "@/lib/contracts";
-import { SignalButton } from "./SignalButton";
-import { SignalBar } from "./SignalBar";
-import { CountdownTimer } from "./CountdownTimer";
 import { useSignal } from "@/hooks/useSignal";
 import { useUserSignal } from "@/hooks/useUserSignal";
 import { useAccount } from "wagmi";
 import { formatMatchDate } from "@/lib/utils";
-import { Trophy, CalendarDays } from "lucide-react";
+import { Trophy, CalendarDays, TrendingUp, Users, CheckCircle2, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
+import Image from "next/image";
 
 interface MatchCardProps {
   match: MatchWithStatus;
   index: number;
 }
 
-/**
- * Match Card Component
- * Displays match information and signal buttons
- */
 export function MatchCard({ match, index }: MatchCardProps) {
   const { isConnected } = useAccount();
   const { signal, isPending, isSuccess } = useSignal();
   const { hasSignaled, teamChoice, refetch } = useUserSignal(match.matchId);
+  const [selectedTeam, setSelectedTeam] = useState<1 | 2 | null>(null);
 
   const totalSignals = Number(match.signalsTeamA) + Number(match.signalsTeamB);
   const isActive = match.status !== "FINISHED";
@@ -35,152 +31,239 @@ export function MatchCard({ match, index }: MatchCardProps) {
       return;
     }
 
+    if (hasSignaled) {
+      alert("You have already signaled for this match");
+      return;
+    }
+
+    setSelectedTeam(teamId);
+
     try {
       await signal(match.matchId, teamId);
-      // Wait a bit for blockchain confirmation
       setTimeout(() => {
         refetch();
-      }, 2000);
-    } catch (error) {
+        setSelectedTeam(null);
+      }, 3000);
+    } catch (error: any) {
       console.error("Signal error:", error);
+      alert(error.message || "Failed to submit signal");
+      setSelectedTeam(null);
     }
   };
+
+  const matchDate = new Date(Number(match.startTime) * 1000);
+  const isLive = match.status === "LIVE";
+  const isFinished = match.status === "FINISHED";
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
-      className={cn(
-        "glass rounded-2xl p-6 hover:bg-white/10 transition-all duration-300",
-        {
-          "opacity-60": match.status === "FINISHED",
-        }
-      )}
+      transition={{ duration: 0.5, delay: index * 0.05 }}
+      className="match-card group"
     >
-      {/* Status Badge */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2 text-sm text-gray-400">
-          <Trophy className="w-4 h-4" />
-          <span>{match.league}</span>
+      {/* Header with League and Status */}
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-2">
+          <Trophy className="w-4 h-4 text-blue-600" />
+          <span className="text-sm font-semibold text-gray-700">{match.league}</span>
         </div>
 
-        {match.status === "LIVE" && (
-          <motion.div
-            animate={{ scale: [1, 1.1, 1] }}
-            transition={{ repeat: Infinity, duration: 2 }}
-            className="flex items-center gap-2 px-3 py-1 bg-red-500/20 border border-red-500 rounded-full pulse-glow"
-          >
-            <div className="w-2 h-2 bg-red-500 rounded-full" />
-            <span className="text-red-400 text-xs font-semibold">LIVE</span>
-          </motion.div>
+        {isLive && (
+          <div className="live-badge">
+            <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+            <span className="text-red-600 text-xs font-bold">LIVE</span>
+          </div>
         )}
 
-        {match.status === "FINISHED" && (
-          <div className="px-3 py-1 bg-gray-700/50 border border-gray-600 rounded-full">
-            <span className="text-gray-400 text-xs font-semibold">FINISHED</span>
+        {isFinished && (
+          <div className="badge badge-success">
+            <CheckCircle2 className="w-3 h-3" />
+            <span>Finished</span>
+          </div>
+        )}
+
+        {!isLive && !isFinished && (
+          <div className="flex items-center gap-1 text-xs text-gray-500">
+            <CalendarDays className="w-3 h-3" />
+            <span>{formatMatchDate(match.startTime)}</span>
           </div>
         )}
       </div>
 
-      {/* Teams */}
-      <div className="grid grid-cols-3 items-center gap-4 mb-6">
-        {/* Team A */}
-        <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-2 bg-white/5 rounded-full flex items-center justify-center border border-white/10">
-            {match.logoA ? (
+      {/* Teams Display */}
+      <div className="relative mb-8">
+        <div className="grid grid-cols-3 gap-4 items-center">
+          {/* Team A */}
+          <div className="flex flex-col items-center gap-3">
+            <div className="team-badge">
               <img
-                src={match.logoA}
+                src={match.logoA || "/placeholder-team.png"}
                 alt={match.teamA}
                 className="w-12 h-12 object-contain"
+                onError={(e) => {
+                  e.currentTarget.src = "/placeholder-team.png";
+                }}
               />
-            ) : (
-              <span className="text-2xl">🛡️</span>
+            </div>
+            <h3 className="text-center text-sm font-bold text-gray-900 line-clamp-2">
+              {match.teamA}
+            </h3>
+            {hasSignaled && teamChoice === 1 && (
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="badge badge-primary"
+              >
+                <CheckCircle2 className="w-3 h-3" />
+                Your Signal
+              </motion.div>
             )}
           </div>
-          <h3 className="font-bold text-lg">{match.teamA}</h3>
-        </div>
 
-        {/* VS */}
-        <div className="text-center">
-          <div className="text-2xl font-bold text-gray-500">VS</div>
-        </div>
+          {/* VS Badge */}
+          <div className="flex flex-col items-center gap-2">
+            <div className="vs-badge">VS</div>
+            <div className="flex items-center gap-1 text-xs text-gray-500">
+              <Users className="w-3 h-3" />
+              <span>{totalSignals} signals</span>
+            </div>
+          </div>
 
-        {/* Team B */}
-        <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-2 bg-white/5 rounded-full flex items-center justify-center border border-white/10">
-            {match.logoB ? (
+          {/* Team B */}
+          <div className="flex flex-col items-center gap-3">
+            <div className="team-badge">
               <img
-                src={match.logoB}
+                src={match.logoB || "/placeholder-team.png"}
                 alt={match.teamB}
                 className="w-12 h-12 object-contain"
+                onError={(e) => {
+                  e.currentTarget.src = "/placeholder-team.png";
+                }}
               />
-            ) : (
-              <span className="text-2xl">🛡️</span>
+            </div>
+            <h3 className="text-center text-sm font-bold text-gray-900 line-clamp-2">
+              {match.teamB}
+            </h3>
+            {hasSignaled && teamChoice === 2 && (
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="badge badge-primary"
+              >
+                <CheckCircle2 className="w-3 h-3" />
+                Your Signal
+              </motion.div>
             )}
           </div>
-          <h3 className="font-bold text-lg">{match.teamB}</h3>
         </div>
       </div>
 
-      {/* Match Date */}
-      <div className="flex items-center justify-center gap-2 text-sm text-gray-400 mb-4">
-        <CalendarDays className="w-4 h-4" />
-        <span>{formatMatchDate(match.startTime)}</span>
-      </div>
-
-      {/* Countdown (only for upcoming) */}
-      {match.status === "UPCOMING" && (
-        <div className="flex justify-center mb-4">
-          <CountdownTimer startTime={match.startTime} />
-        </div>
-      )}
-
-      {/* Signal Bar */}
+      {/* Signal Percentage Bar */}
       <div className="mb-6">
-        <SignalBar
-          percentageA={match.percentageA}
-          percentageB={match.percentageB}
-          teamA={match.teamA}
-          teamB={match.teamB}
-          totalSignals={totalSignals}
-        />
+        <div className="flex justify-between mb-2">
+          <span className="text-2xl font-black text-blue-600">{match.percentageA}%</span>
+          <span className="text-2xl font-black text-blue-600">{match.percentageB}%</span>
+        </div>
+        <div className="signal-bar">
+          <motion.div
+            className="signal-bar-fill bg-gradient-to-r from-blue-600 to-blue-500"
+            initial={{ width: 0 }}
+            animate={{ width: `${match.percentageA}%` }}
+          />
+        </div>
       </div>
 
       {/* Signal Buttons */}
-      {isActive && match.isActive ? (
-        <div className="grid grid-cols-2 gap-4">
-          <SignalButton
-            teamName={match.teamA}
-            teamId={1}
+      {isActive && !hasSignaled && isConnected && (
+        <div className="grid grid-cols-2 gap-3">
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => handleSignal(1)}
-            disabled={hasSignaled || !isConnected}
-            isSelected={hasSignaled && teamChoice === 1}
-            isPending={isPending}
-          />
-          <SignalButton
-            teamName={match.teamB}
-            teamId={2}
+            disabled={isPending}
+            className={cn(
+              "signal-btn bg-gradient-to-br from-blue-500 to-blue-600 text-white font-bold py-4 disabled:opacity-50 disabled:cursor-not-allowed",
+              {
+                "signal-pulse": selectedTeam === 1 && isPending,
+              }
+            )}
+          >
+            {isPending && selectedTeam === 1 ? (
+              <div className="flex items-center justify-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Signaling...</span>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center gap-1">
+                <TrendingUp className="w-5 h-5" />
+                <span>Signal {match.teamA}</span>
+              </div>
+            )}
+          </motion.button>
+
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => handleSignal(2)}
-            disabled={hasSignaled || !isConnected}
-            isSelected={hasSignaled && teamChoice === 2}
-            isPending={isPending}
-          />
-        </div>
-      ) : (
-        <div className="text-center text-gray-500 text-sm">
-          Signaling closed
+            disabled={isPending}
+            className={cn(
+              "signal-btn bg-gradient-to-br from-blue-600 to-blue-700 text-white font-bold py-4 disabled:opacity-50 disabled:cursor-not-allowed",
+              {
+                "signal-pulse": selectedTeam === 2 && isPending,
+              }
+            )}
+          >
+            {isPending && selectedTeam === 2 ? (
+              <div className="flex items-center justify-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Signaling...</span>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center gap-1">
+                <TrendingUp className="w-5 h-5" />
+                <span>Signal {match.teamB}</span>
+              </div>
+            )}
+          </motion.button>
         </div>
       )}
 
-      {/* User feedback */}
+      {/* Already Signaled Message */}
       {hasSignaled && (
+        <div className="glass-card p-4 text-center border-2 border-blue-200">
+          <div className="flex items-center justify-center gap-2 text-blue-700 font-semibold">
+            <CheckCircle2 className="w-5 h-5" />
+            <span>You signaled for {teamChoice === 1 ? match.teamA : match.teamB}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Connect Wallet Message */}
+      {!isConnected && isActive && (
+        <div className="glass-card p-4 text-center border border-blue-200">
+          <p className="text-sm text-gray-600">Connect your wallet to signal</p>
+        </div>
+      )}
+
+      {/* Success Animation */}
+      {isSuccess && selectedTeam && (
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="mt-4 text-center text-sm text-green-400"
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className="absolute inset-0 flex items-center justify-center bg-blue-500/10 backdrop-blur-sm rounded-3xl"
         >
-          ✓ You signaled for {teamChoice === 1 ? match.teamA : match.teamB}
+          <div className="glass-card p-8">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: [0, 1.2, 1] }}
+              transition={{ duration: 0.5 }}
+            >
+              <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto mb-4" />
+            </motion.div>
+            <p className="text-lg font-bold text-gray-900">Signal Recorded!</p>
+            <p className="text-sm text-gray-600 mt-1">Transaction confirmed on Base</p>
+          </div>
         </motion.div>
       )}
     </motion.div>
