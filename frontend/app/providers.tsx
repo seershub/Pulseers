@@ -3,7 +3,8 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider } from "wagmi";
 import { config } from "@/lib/wagmi";
-import { useState, type ReactNode } from "react";
+import { useState, useEffect, type ReactNode } from "react";
+import { sdk } from "@farcaster/miniapp-sdk";
 
 /**
  * Root Providers Component
@@ -21,6 +22,21 @@ export function Providers({ children }: { children: ReactNode }) {
         },
       })
   );
+
+  // Initialize Farcaster SDK and signal ready
+  useEffect(() => {
+    const initFarcaster = async () => {
+      try {
+        // Signal that the app is ready to be displayed
+        await sdk.actions.ready();
+        console.log("✅ Farcaster SDK: App is ready");
+      } catch (error) {
+        console.error("❌ Farcaster SDK ready() error:", error);
+      }
+    };
+
+    initFarcaster();
+  }, []);
 
   return (
     <WagmiProvider config={config}>

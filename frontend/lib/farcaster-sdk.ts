@@ -1,9 +1,9 @@
 /**
  * Farcaster SDK Configuration
- * Pattern from SeersLeague + Base Docs
+ * Using official @farcaster/miniapp-sdk
  */
 
-import { sdk as farcasterSdk } from "@farcaster/frame-sdk";
+import { sdk as farcasterSdk } from "@farcaster/miniapp-sdk";
 
 export const sdk = farcasterSdk;
 
