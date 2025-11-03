@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useWalletClient, usePublicClient } from "wagmi";
 import { getContractAddress } from "@/lib/viem-config";
 import { PULSEERS_ABI } from "@/lib/contracts";
-import { createWalletClient, custom } from "viem";
+import { createWalletClient, custom, type Account } from "viem";
 import { base } from "viem/chains";
 import { sdk } from "@/lib/farcaster-sdk";
 import { useWallet } from "@/hooks/useWallet";
@@ -36,7 +36,7 @@ export function useSignal() {
 
       // Use Farcaster wallet if detected, otherwise use regular wallet
       let clientToUse = walletClient;
-      let accountToUse = address;
+      let accountToUse: `0x${string}` | Account | null = address ? (address as `0x${string}`) : null;
 
       // If useWallet detected Farcaster wallet, use it
       if (isFarcaster && sdk.wallet?.ethProvider) {
@@ -64,6 +64,11 @@ export function useSignal() {
 
       if (!clientToUse || !accountToUse) {
         throw new Error("No wallet connected");
+      }
+
+      // Type guard: ensure accountToUse is not null
+      if (!accountToUse) {
+        throw new Error("No wallet account available");
       }
 
       console.log("👤 Using account:", accountToUse);
@@ -106,7 +111,7 @@ export function useSignal() {
         abi: PULSEERS_ABI,
         functionName: "signal",
         args: [matchId, teamId],
-        account: accountToUse,
+        account: accountToUse, // TypeScript now knows this is not null
         chain: base,
       });
 
