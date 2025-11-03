@@ -1,21 +1,29 @@
 "use client";
 
 import { useState } from "react";
-import { createPublicClient, createWalletClient, custom, http } from "viem";
-import { base } from "viem/chains";
+import { useAccount, useWalletClient, usePublicClient } from "wagmi";
 import { getContractAddress } from "@/lib/viem-config";
 import { PULSEERS_ABI } from "@/lib/contracts";
+import { createWalletClient, custom } from "viem";
+import { base } from "viem/chains";
 import { sdk } from "@/lib/farcaster-sdk";
 
 /**
- * Hook to handle signaling with Farcaster SDK (Pattern from SeersLeague)
- * Uses direct Viem + Farcaster SDK for Mini App compatibility
+ * Universal Signal Hook
+ * Works with:
+ * - Browser wallets (MetaMask, Zerion, Rainbow, etc.)
+ * - Coinbase Wallet / Smart Wallet
+ * - Farcaster Mini App wallet
  */
 export function useSignal() {
   const [isPending, setIsPending] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [hash, setHash] = useState<string | null>(null);
+
+  const { address } = useAccount();
+  const { data: walletClient } = useWalletClient();
+  const publicClient = usePublicClient();
 
   const signal = async (matchId: bigint, teamId: 1 | 2) => {
     setIsPending(true);
@@ -25,57 +33,44 @@ export function useSignal() {
     try {
       console.log("🎯 Submitting signal:", { matchId, teamId });
 
-      let walletClient;
-      let account: `0x${string}` | undefined;
+      let clientToUse = walletClient;
+      let accountToUse = address;
 
-      // Check if we're in Farcaster Mini App
-      const isInMiniApp = await sdk.isInMiniApp();
+      // Check if we're in Farcaster Mini App and no regular wallet is connected
+      if (!walletClient) {
+        const isInMiniApp = await sdk.isInMiniApp();
 
-      if (isInMiniApp) {
-        // Use Farcaster SDK wallet
-        console.log("📱 Running in Farcaster Mini App");
+        if (isInMiniApp) {
+          console.log("📱 Using Farcaster Mini App wallet");
+          const context = await sdk.context;
+          console.log("👤 Farcaster user:", context.user);
 
-        const context = await sdk.context;
-        console.log("👤 User context:", context.user);
+          // Create wallet client with Farcaster SDK
+          clientToUse = createWalletClient({
+            chain: base,
+            transport: custom(sdk.wallet.ethProvider),
+          });
 
-        // Create wallet client with Farcaster wallet provider
-        walletClient = createWalletClient({
-          chain: base,
-          transport: custom(sdk.wallet.ethProvider),
-        });
-
-        // Get account from wallet
-        const [addr] = await walletClient.getAddresses();
-        account = addr;
-        console.log("✅ Account from Farcaster wallet:", account);
-      } else if (typeof window !== "undefined" && (window as any).ethereum) {
-        // Fallback to injected wallet (MetaMask, etc.)
-        console.log("🦊 Using injected wallet");
-        walletClient = createWalletClient({
-          chain: base,
-          transport: custom((window as any).ethereum),
-        });
-
-        const [addr] = await walletClient.getAddresses();
-        account = addr;
-      } else {
-        throw new Error("No wallet found. Please connect your wallet or open in Farcaster Mini App.");
+          const [addr] = await clientToUse.getAddresses();
+          accountToUse = addr;
+          console.log("✅ Farcaster account:", accountToUse);
+        } else {
+          throw new Error("Please connect your wallet to signal");
+        }
       }
 
-      if (!account) {
-        throw new Error("No account found. Please connect your wallet.");
+      if (!clientToUse || !accountToUse) {
+        throw new Error("No wallet connected");
       }
 
-      console.log("👤 Using account:", account);
+      console.log("👤 Using account:", accountToUse);
 
       const contractAddress = getContractAddress();
       console.log("📝 Contract:", contractAddress);
 
-      // Prepare transaction
-      const publicClient = createPublicClient({
-        chain: base,
-        transport: http(),
-      });
+      if (!publicClient) {
+        throw new Error("Public client not available");
+      }
 
       // Simulate transaction first
       console.log("🔍 Simulating transaction...");
@@ -84,13 +79,13 @@ export function useSignal() {
         abi: PULSEERS_ABI,
         functionName: "signal",
         args: [matchId, teamId],
-        account,
+        account: accountToUse,
       });
 
       console.log("✅ Simulation successful, sending transaction...");
 
       // Send transaction
-      const txHash = await walletClient.writeContract(request);
+      const txHash = await clientToUse.writeContract(request);
 
       console.log("📤 Transaction sent:", txHash);
       setHash(txHash);

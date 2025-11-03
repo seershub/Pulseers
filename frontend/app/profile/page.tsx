@@ -99,53 +99,87 @@ export default function ProfilePage() {
           </div>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="stats-card">
-            <TrendingUp className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-            <div className="text-4xl font-black text-blue-600 mb-1">0</div>
-            <div className="text-sm text-gray-600 font-semibold">Total Signals</div>
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="glass-card rounded-2xl p-6 text-center hover:shadow-xl transition-all"
+          >
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mx-auto mb-3">
+              <TrendingUp className="w-6 h-6 text-white" />
+            </div>
+            <div className="text-3xl font-black gradient-text mb-1">0</div>
+            <div className="text-xs text-gray-500 font-semibold uppercase tracking-wide">Total Signals</div>
           </motion.div>
 
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="stats-card">
-            <Trophy className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-            <div className="text-4xl font-black text-blue-600 mb-1">0</div>
-            <div className="text-sm text-gray-600 font-semibold">Matches</div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            className="glass-card rounded-2xl p-6 text-center hover:shadow-xl transition-all"
+          >
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center mx-auto mb-3">
+              <Award className="w-6 h-6 text-white" />
+            </div>
+            <div className="text-3xl font-black gradient-text mb-1">0</div>
+            <div className="text-xs text-gray-500 font-semibold uppercase tracking-wide">Wins</div>
           </motion.div>
 
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="stats-card">
-            <Award className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-            <div className="text-4xl font-black text-blue-600 mb-1">0%</div>
-            <div className="text-sm text-gray-600 font-semibold">Accuracy</div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="glass-card rounded-2xl p-6 text-center hover:shadow-xl transition-all"
+          >
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center mx-auto mb-3">
+              <Target className="w-6 h-6 text-white" />
+            </div>
+            <div className="text-3xl font-black gradient-text mb-1">0%</div>
+            <div className="text-xs text-gray-500 font-semibold uppercase tracking-wide">Accuracy</div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}
+            className="glass-card rounded-2xl p-6 text-center hover:shadow-xl transition-all"
+          >
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center mx-auto mb-3">
+              <Trophy className="w-6 h-6 text-white" />
+            </div>
+            <div className="text-3xl font-black gradient-text mb-1">--</div>
+            <div className="text-xs text-gray-500 font-semibold uppercase tracking-wide">Rank</div>
           </motion.div>
         </div>
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="glass-card rounded-3xl p-8">
-          <h2 className="text-2xl font-black gradient-text mb-4">Basename Integration</h2>
-          <p className="text-gray-600 mb-4">
-            Connect your Base name to personalize your profile and compete in leaderboards.
-          </p>
-          <div className="space-y-3">
-            <div className="flex items-center gap-3 p-4 bg-blue-50 rounded-xl border border-blue-100">
-              <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center">
-                <span className="text-white font-black text-sm">B</span>
-              </div>
-              <div className="flex-1">
-                <p className="font-semibold text-gray-900">Basename Coming Soon</p>
-                <p className="text-xs text-gray-500">Register your unique .base.eth identity</p>
-              </div>
+        {/* Activity Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="glass-card rounded-3xl p-8"
+        >
+          <h2 className="text-2xl font-black gradient-text mb-6 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+              <TrendingUp className="w-5 h-5 text-white" />
             </div>
+            Recent Activity
+          </h2>
 
-            {isInMiniApp && (
-              <div className="p-4 bg-purple-50 rounded-xl border border-purple-100">
-                <p className="text-sm text-purple-700">
-                  ✨ You&apos;re using Farcaster! Basename integration will allow you to use your Base identity across the platform.
-                </p>
-              </div>
-            )}
-
-            <button className="btn-secondary w-full" disabled>
-              Coming Soon
-            </button>
+          <div className="text-center py-12">
+            <div className="w-20 h-20 rounded-full bg-blue-50 flex items-center justify-center mx-auto mb-4">
+              <Trophy className="w-10 h-10 text-blue-300" />
+            </div>
+            <p className="text-gray-600 font-semibold mb-2">No signals yet</p>
+            <p className="text-sm text-gray-500 mb-6">
+              Start signaling for your favorite teams to build your stats
+            </p>
+            <a href="/" className="btn-primary inline-flex items-center gap-2">
+              <TrendingUp className="w-4 h-4" />
+              View Matches
+            </a>
           </div>
         </motion.div>
       </div>

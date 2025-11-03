@@ -178,55 +178,49 @@ export function MatchCard({ match, index }: MatchCardProps) {
         </div>
       </div>
 
-      {/* Signal Buttons */}
+      {/* Signal Buttons - Compact */}
       {isActive && !hasSignaled && isConnected && (
         <div className="grid grid-cols-2 gap-3">
           <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={() => handleSignal(1)}
             disabled={isPending}
             className={cn(
-              "signal-btn bg-gradient-to-br from-blue-500 to-blue-600 text-white font-bold py-4 disabled:opacity-50 disabled:cursor-not-allowed",
+              "relative overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed",
               {
-                "signal-pulse": selectedTeam === 1 && isPending,
+                "animate-pulse": selectedTeam === 1 && isPending,
               }
             )}
           >
             {isPending && selectedTeam === 1 ? (
-              <div className="flex items-center justify-center gap-2">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Signaling...</span>
-              </div>
+              <Loader2 className="w-5 h-5 mx-auto animate-spin" />
             ) : (
-              <div className="flex flex-col items-center gap-1">
-                <TrendingUp className="w-5 h-5" />
-                <span>Signal {match.teamA}</span>
+              <div className="flex items-center justify-center gap-2">
+                <TrendingUp className="w-4 h-4" />
+                <span className="text-sm">Signal</span>
               </div>
             )}
           </motion.button>
 
           <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={() => handleSignal(2)}
             disabled={isPending}
             className={cn(
-              "signal-btn bg-gradient-to-br from-blue-600 to-blue-700 text-white font-bold py-4 disabled:opacity-50 disabled:cursor-not-allowed",
+              "relative overflow-hidden bg-gradient-to-br from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed",
               {
-                "signal-pulse": selectedTeam === 2 && isPending,
+                "animate-pulse": selectedTeam === 2 && isPending,
               }
             )}
           >
             {isPending && selectedTeam === 2 ? (
-              <div className="flex items-center justify-center gap-2">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Signaling...</span>
-              </div>
+              <Loader2 className="w-5 h-5 mx-auto animate-spin" />
             ) : (
-              <div className="flex flex-col items-center gap-1">
-                <TrendingUp className="w-5 h-5" />
-                <span>Signal {match.teamB}</span>
+              <div className="flex items-center justify-center gap-2">
+                <TrendingUp className="w-4 h-4" />
+                <span className="text-sm">Signal</span>
               </div>
             )}
           </motion.button>
