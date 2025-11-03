@@ -1,16 +1,15 @@
 {
   "accountAssociation": {
-    "header": "eyJmaWQiOjEsInR5cGUiOiJjdXN0b2R5Iiwia2V5IjoiMHgwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwIn0",
-    "payload": "eyJkb21haW4iOiJwdWxzZWVycy5zZWVyc2h1Yi5jb20ifQ",
+    "header": "eyJmaWQiOjEsInR5cGUiOiJjdXN0b2R5Iiwia2V5IjoiMHhFNjQzNzE5NzY2RDEwOWM2MzMyRjQ5RDRCYjY2RDM4ODhGNzA1QkRGIn0",
+    "payload": "eyJkb21haW4iOiJwdWxzZWVycy5jb20ifQ",
     "signature": "MHg..."
   },
   "frame": {
     "version": "1",
     "name": "Pulseers",
-    "iconUrl": "https://pulseers.seershub.com/icon-512.png",
-    "splashImageUrl": "https://pulseers.seershub.com/splash.png",
-    "splashBackgroundColor": "#0a0f1e",
-    "homeUrl": "https://pulseers.seershub.com",
-    "webhookUrl": "https://pulseers.seershub.com/api/webhook"
+    "iconUrl": "https://your-domain.vercel.app/icon-512x512.png",
+    "splashImageUrl": "https://your-domain.vercel.app/splash.png",
+    "splashBackgroundColor": "#0A0F1E",
+    "homeUrl": "https://your-domain.vercel.app"
   }
 }

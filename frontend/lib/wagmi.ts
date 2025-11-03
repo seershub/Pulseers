@@ -21,8 +21,8 @@ export const config = createConfig({
     injected(),
   ],
   transports: {
-    [base.id]: http(),
-    [baseSepolia.id]: http(),
+    [base.id]: http(process.env.NEXT_PUBLIC_BASE_RPC_URL || "https://mainnet.base.org"),
+    [baseSepolia.id]: http("https://sepolia.base.org"),
   },
   ssr: true,
 });
