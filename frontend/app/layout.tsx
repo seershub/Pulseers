@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     apple: [{ url: "/icon-1024.png", sizes: "1024x1024", type: "image/png" }],
   },
   openGraph: {
-    title: "Pulseers - Football Predictions",
+    title: "Pulseers",
     description: "Predict football matches daily on Base Mainnet and compete for prizes!",
     url: "https://pulseers.seershub.com",
     siteName: "Pulseers",
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Pulseers - Football Predictions",
+    title: "Pulseers",
     description: "Predict football matches daily on Base Mainnet and compete for prizes!",
     images: ["https://pulseers.seershub.com/og-image.png"],
   },
