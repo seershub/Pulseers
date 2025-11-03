@@ -301,8 +301,8 @@ export default function HomePage() {
             </>
           ) : (
             <>
-              {activeFilter !== "ALL" && (
-                <MatchList status={activeFilter as MatchStatus} />
+              {(activeFilter === "LIVE" || activeFilter === "UPCOMING" || activeFilter === "FINISHED") && (
+                <MatchList status={activeFilter} />
               )}
               {/* Show players section even when filtered */}
               {activeFilter === "LIVE" ? (
