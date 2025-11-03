@@ -1,76 +1,88 @@
 "use client";
 
-import { useReadContract, useWatchContractEvent } from "wagmi";
-import { PULSEERS_ADDRESS, PULSEERS_ABI, Match, MatchWithStatus } from "@/lib/contracts";
+import { useState, useEffect } from "react";
+import { MatchWithStatus } from "@/lib/contracts";
 import { getMatchStatus, calculatePercentages } from "@/lib/utils";
-import { useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
 
 /**
- * Hook to fetch all matches from the contract
+ * Hook to fetch all matches from API route
+ * Pattern from SeersLeague - fetch from API instead of direct contract reads
  */
 export function useMatches() {
-  const queryClient = useQueryClient();
+  const [matches, setMatches] = useState<MatchWithStatus[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Get all match IDs
-  const { data: matchIds, isLoading: loadingIds } = useReadContract({
-    address: PULSEERS_ADDRESS,
-    abi: PULSEERS_ABI,
-    functionName: "getAllMatchIds",
-  });
+  const fetchMatches = async () => {
+    try {
+      console.log("🔄 Fetching matches from API...");
+      const response = await fetch("/api/matches", {
+        cache: "no-store",
+      });
 
-  // Get match details for all IDs
-  const { data: matches, isLoading: loadingMatches, refetch } = useReadContract({
-    address: PULSEERS_ADDRESS,
-    abi: PULSEERS_ABI,
-    functionName: "getMatches",
-    args: matchIds ? [matchIds] : undefined,
-    query: {
-      enabled: !!matchIds && matchIds.length > 0,
-    },
-  });
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
 
-  // Watch for new matches being added
-  useWatchContractEvent({
-    address: PULSEERS_ADDRESS,
-    abi: PULSEERS_ABI,
-    eventName: "MatchesAdded",
-    onLogs: () => {
-      refetch();
-    },
-  });
+      const data = await response.json();
 
-  // Watch for signal events to update percentages
-  useWatchContractEvent({
-    address: PULSEERS_ADDRESS,
-    abi: PULSEERS_ABI,
-    eventName: "SignalAdded",
-    onLogs: () => {
-      refetch();
-    },
-  });
+      console.log("📦 API response:", data);
 
-  // Process matches with status and percentages
-  const matchesWithStatus: MatchWithStatus[] =
-    matches?.map((match: Match) => {
-      const status = getMatchStatus(match.startTime);
-      const { percentageA, percentageB } = calculatePercentages(
-        match.signalsTeamA,
-        match.signalsTeamB
-      );
+      if (!data.success) {
+        throw new Error(data.message || "Failed to fetch matches");
+      }
 
-      return {
-        ...match,
-        status,
-        percentageA,
-        percentageB,
-      };
-    }) || [];
+      // Process matches with status and percentages
+      const processedMatches: MatchWithStatus[] = data.matches.map((match: any) => {
+        const status = getMatchStatus(BigInt(match.startTime));
+        const { percentageA, percentageB } = calculatePercentages(
+          BigInt(match.signalsTeamA),
+          BigInt(match.signalsTeamB)
+        );
+
+        return {
+          matchId: BigInt(match.matchId),
+          teamA: match.teamA,
+          teamB: match.teamB,
+          league: match.league,
+          logoA: match.logoA,
+          logoB: match.logoB,
+          startTime: BigInt(match.startTime),
+          signalsTeamA: BigInt(match.signalsTeamA),
+          signalsTeamB: BigInt(match.signalsTeamB),
+          isActive: match.isActive,
+          status,
+          percentageA,
+          percentageB,
+        };
+      });
+
+      console.log("✅ Processed matches:", processedMatches.length);
+      setMatches(processedMatches);
+      setError(null);
+    } catch (err: any) {
+      console.error("❌ Error fetching matches:", err);
+      setError(err.message);
+      setMatches([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMatches();
+
+    // Poll every 30 seconds like SeersLeague
+    const interval = setInterval(fetchMatches, 30000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return {
-    matches: matchesWithStatus,
-    isLoading: loadingIds || loadingMatches,
-    refetch,
+    matches,
+    isLoading,
+    error,
+    refetch: fetchMatches,
   };
 }
 
