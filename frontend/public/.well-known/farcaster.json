@@ -5,10 +5,7 @@
     "signature": "vQzqRGfQfXvHKnX3thoqXZ41Jv7EJMskR8gafea4qeNi2ZP9cTGHF9y7Ed8rKzBJtNeRNmn4+Sr0OJ1DQvFqFhw="
   },
   "baseBuilder": {
-    "ownerAddress": "0x2F8b89f74C0540B638CF808515dFabe565796aAA",
-    "allowedAddresses": [
-      "0x2F8b89f74C0540B638CF808515dFabe565796aAA"
-    ]
+    "ownerAddress": "0x2F8b89f74C0540B638CF808515dFabe565796aAA"
   },
   "miniapp": {
     "version": "1",

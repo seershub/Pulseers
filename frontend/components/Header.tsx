@@ -83,26 +83,20 @@ export function Header() {
             )}
           </nav>
 
-          {/* Wallet Connection - Compact */}
+          {/* Wallet Connection - Unified display */}
           <div className="flex items-center gap-2">
-            {isConnected && address && (
-              <>
-                {/* Wallet Address - Compact display */}
-                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg border border-blue-200 shadow-sm">
-                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
-                  <span className="text-xs font-semibold text-blue-700 font-mono">
-                    {formatAddress(address)}
-                  </span>
-                </div>
-                {/* In browser, show ConnectWallet dropdown for disconnect */}
-                {/* In Farcaster/BaseApp, wallet is auto-connected and cannot be disconnected */}
-                {!isFarcasterAvailable && (
-                  <ConnectWallet />
-                )}
-              </>
+            {isFarcasterAvailable && isConnected && address ? (
+              /* In Farcaster/BaseApp: Show only address badge */
+              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg border border-blue-200 shadow-sm">
+                <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+                <span className="text-xs font-semibold text-blue-700 font-mono">
+                  {formatAddress(address)}
+                </span>
+              </div>
+            ) : (
+              /* In Browser: Show OnchainKit Wallet (handles both connected and not connected states) */
+              <ConnectWallet />
             )}
-            {/* ConnectWallet only shows in browser when not connected */}
-            {!isConnected && <ConnectWallet />}
           </div>
         </div>
 

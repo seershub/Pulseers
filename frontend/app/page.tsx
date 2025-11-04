@@ -91,137 +91,52 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col safe-area-top safe-area-bottom">
+    <div className="min-h-screen flex flex-col safe-area-top safe-area-bottom overflow-x-hidden w-full">
       <Header />
 
-      <main className="flex-1 container mx-auto px-4 max-w-6xl">
-        {/* Hero Section - Enhanced with Base Blue and Animations */}
+      <main className="flex-1 w-full mx-auto px-4 max-w-6xl overflow-x-hidden">
+        {/* Hero Section - Modern & Compact */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="relative overflow-hidden rounded-3xl mb-12 mt-8 shadow-2xl"
+          transition={{ duration: 0.5 }}
+          className="relative overflow-hidden rounded-2xl mb-8 mt-6"
         >
-          {/* Animated Background Gradient */}
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-blue-500 to-purple-600 opacity-95" />
-          <div className="absolute inset-0 bg-gradient-to-t from-blue-900/20 via-transparent to-blue-300/20" />
-          
-          {/* Animated Grid Pattern */}
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjE1IiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-40" />
-
-          {/* Animated Floating Orbs */}
-          <motion.div
-            animate={{
-              scale: [1, 1.3, 1],
-              opacity: [0.2, 0.5, 0.2],
-              x: [0, 30, 0],
-              y: [0, -20, 0],
-            }}
-            transition={{
-              duration: 6,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-            className="absolute top-10 right-10 w-72 h-72 bg-white rounded-full blur-3xl"
-          />
-          <motion.div
-            animate={{
-              scale: [1.2, 1, 1.2],
-              opacity: [0.15, 0.35, 0.15],
-              x: [0, -40, 0],
-              y: [0, 30, 0],
-            }}
-            transition={{
-              duration: 8,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 1,
-            }}
-            className="absolute bottom-10 left-10 w-96 h-96 bg-purple-300 rounded-full blur-3xl"
-          />
-          <motion.div
-            animate={{
-              scale: [0.8, 1.1, 0.8],
-              opacity: [0.1, 0.3, 0.1],
-              x: [0, 20, 0],
-              y: [0, -40, 0],
-            }}
-            transition={{
-              duration: 7,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 2,
-            }}
-            className="absolute top-1/2 left-1/2 w-64 h-64 bg-blue-200 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"
-          />
-
-          {/* Content - Compact Hero Section */}
-          <div className="relative z-10 text-center py-10 md:py-12 px-6">
-            {/* Animated Badge */}
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0, y: -20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.6, type: "spring" }}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-white/25 backdrop-blur-lg rounded-full border-2 border-white/40 mb-4 shadow-xl"
-            >
-              <motion.div
-                animate={{ scale: [1, 1.3, 1], rotate: [0, 180, 360] }}
-                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                className="w-2.5 h-2.5 bg-white rounded-full shadow-lg"
-              />
-              <span className="text-xs md:text-sm font-bold text-white tracking-wide uppercase">Signal Your Team On-Chain</span>
-            </motion.div>
-
-            {/* Main Title with Animation */}
-            <motion.h1
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.3, duration: 0.6, type: "spring" }}
-              className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-3 drop-shadow-2xl"
-            >
-              <motion.span
-                animate={{ 
-                  backgroundPosition: ["0%", "100%"],
-                }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  repeatType: "reverse",
-                }}
-                className="bg-clip-text text-transparent bg-gradient-to-r from-white via-blue-100 to-white bg-[length:200%_auto]"
-              >
-                Pulseers
-              </motion.span>
-            </motion.h1>
-
-            {/* Description */}
-            <motion.p
-              initial={{ y: 10, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.4, duration: 0.5 }}
-              className="text-white/90 text-base md:text-lg max-w-xl mx-auto font-medium leading-relaxed drop-shadow-lg mb-4"
-            >
-              Support your favorite teams with on-chain signals. One signal per match, powered by Base.
-            </motion.p>
-
-            {/* Base Logo Badge */}
-            <motion.div
-              initial={{ y: 10, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.5, duration: 0.5 }}
-              whileHover={{ scale: 1.05 }}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-lg rounded-full border-2 border-white/30 shadow-lg hover:bg-white/25 transition-all cursor-default"
-            >
-              <motion.div
-                whileHover={{ rotate: 360 }}
-                transition={{ duration: 0.6 }}
-                className="w-6 h-6 rounded-full bg-white flex items-center justify-center shadow-md"
-              >
-                <span className="text-blue-600 text-xs font-black">B</span>
-              </motion.div>
-              <span className="text-white text-sm font-semibold">Built on Base</span>
-            </motion.div>
+          {/* Modern Gradient Background with subtle mesh */}
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-600" />
+          <div className="absolute inset-0 opacity-20">
+            <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjEiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')]" />
           </div>
+
+          {/* Content - Clean & Compact */}
+          <div className="relative z-10 px-6 py-8 md:py-10">
+            {/* Header with Badge and Base Logo */}
+            <div className="flex items-center justify-between mb-3">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-full border border-white/30">
+                <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
+                <span className="text-xs font-bold text-white tracking-wide uppercase">On-Chain Signaling</span>
+              </div>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white/25 backdrop-blur-sm rounded-full border border-white/40">
+                <div className="w-4 h-4 rounded-full bg-white flex items-center justify-center">
+                  <span className="text-blue-600 text-[10px] font-black">B</span>
+                </div>
+                <span className="text-white text-xs font-bold">Base</span>
+              </div>
+            </div>
+
+            {/* Title */}
+            <h1 className="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight">
+              Pulseers
+            </h1>
+
+            {/* Description - Compact */}
+            <p className="text-white/90 text-sm md:text-base max-w-lg font-medium leading-relaxed">
+              Support your favorite teams with on-chain signals. One signal per match.
+            </p>
+          </div>
+
+          {/* Subtle glow effect at bottom */}
+          <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black/10 to-transparent" />
         </motion.div>
 
         {/* Filter Tabs - Grid Layout for Mobile */}
