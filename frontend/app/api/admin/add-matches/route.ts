@@ -78,10 +78,19 @@ export async function POST(request: NextRequest) {
     if (isMockData) {
       return NextResponse.json(
         {
-          error: "Using mock data - Football API key not configured",
-          message: "NEXT_PUBLIC_FOOTBALL_API_KEY is missing or invalid",
-          hint: "Get a free API key from https://www.football-data.org/ and add it to Vercel Environment Variables",
-          mockMatches: matches.length
+          error: "Football API key not configured",
+          message: "NEXT_PUBLIC_FOOTBALL_API_KEY is missing or invalid in Vercel Environment Variables",
+          instructions: [
+            "1. Get a FREE API key from https://www.football-data.org/",
+            "2. Go to Vercel Dashboard → Your Project → Settings → Environment Variables",
+            "3. Add: NEXT_PUBLIC_FOOTBALL_API_KEY with your API key",
+            "4. Redeploy the application",
+            "5. Try adding matches again"
+          ],
+          note: "The free tier allows 10 requests per minute - perfect for this app",
+          apiKeyFormat: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+          currentMatches: matches.length,
+          mockData: true
         },
         { status: 400 }
       );
@@ -163,16 +172,45 @@ export async function POST(request: NextRequest) {
 
 // GET endpoint to check status
 export async function GET() {
+  const hasApiKey = !!process.env.NEXT_PUBLIC_FOOTBALL_API_KEY;
+
   return NextResponse.json({
     endpoint: "/api/admin/add-matches",
     method: "POST",
-    description: "Add upcoming matches to the smart contract",
+    description: "Add upcoming matches from Football Data API to the smart contract",
+
+    status: {
+      footballApiConfigured: hasApiKey,
+      contractAddress: "0xDB92bc5D7Eee9397d4486EF1d6fbB3DD68bEb640",
+      chain: "Base Mainnet",
+    },
+
     usage: {
+      method: "POST",
       body: {
-        adminKey: "your-private-key-here",
+        adminKey: "your-contract-owner-private-key",
         limit: 10,
       },
+      example: `curl -X POST https://your-domain.com/api/admin/add-matches \\
+  -H "Content-Type: application/json" \\
+  -d '{"adminKey": "0x...", "limit": 10}'`,
     },
+
+    requirements: [
+      "✓ Contract owner private key",
+      hasApiKey ? "✓ Football API key configured" : "✗ Football API key NOT configured",
+      "✓ Valid RPC connection to Base Mainnet",
+    ],
+
+    setup: hasApiKey ? "All set! Ready to add matches." : {
+      missing: "NEXT_PUBLIC_FOOTBALL_API_KEY",
+      instructions: [
+        "1. Get FREE API key: https://www.football-data.org/",
+        "2. Add to Vercel: Settings → Environment Variables",
+        "3. Redeploy application",
+      ],
+    },
+
     note: "Only contract owner can add matches. Private key must match contract owner address.",
   });
 }

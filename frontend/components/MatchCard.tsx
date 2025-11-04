@@ -228,7 +228,7 @@ export function MatchCard({ match, index }: MatchCardProps) {
               ) : (
                 <div className="flex items-center justify-center gap-2">
                   <TrendingUp className="w-4 h-4" />
-                  <span className="text-sm">Signal {match.teamA}</span>
+                  <span className="text-sm">Signal</span>
                 </div>
               )}
             </motion.button>
@@ -250,7 +250,7 @@ export function MatchCard({ match, index }: MatchCardProps) {
               ) : (
                 <div className="flex items-center justify-center gap-2">
                   <TrendingUp className="w-4 h-4" />
-                  <span className="text-sm">Signal {match.teamB}</span>
+                  <span className="text-sm">Signal</span>
                 </div>
               )}
             </motion.button>

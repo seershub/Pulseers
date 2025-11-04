@@ -9,7 +9,6 @@ import { TrendingUp, Zap, CheckCircle, Trophy } from "lucide-react";
 import { sdk } from "@/lib/farcaster-sdk";
 import { useWallet } from "@/hooks/useWallet";
 import { usePlayerSignal } from "@/hooks/usePlayerSignal";
-import { MatchStatus } from "@/lib/contracts";
 
 /**
  * Main Page Component
@@ -74,7 +73,7 @@ export default function HomePage() {
     try {
       const txHash = await signalPlayer(playerId);
       console.log("✅ Player signal successful, txHash:", txHash);
-      
+
       // Update local state after successful on-chain signal
       setUserSignaledPlayers(prev => new Set(prev).add(playerId));
     } catch (error: any) {
