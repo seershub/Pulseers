@@ -34,39 +34,39 @@ export default function HomePage() {
     init();
   }, []);
 
-  // Player data - Update image paths to your player card images
+  // Real Player Cards - Young Stars Edition
   const bestPlayers = [
     {
-      id: "player-1",
-      name: "Cristiano Ronaldo",
-      position: "FW",
-      team: "Al Nassr",
-      image: "/player-1.png", // Update with your player card image path
-      signalCount: 1247,
+      id: "lamin-yamal",
+      name: "Lamin Yamal",
+      position: "RW",
+      team: "FC Barcelona",
+      image: "/6.png",
+      signalCount: 0,
     },
     {
-      id: "player-2",
-      name: "Lionel Messi",
-      position: "FW",
-      team: "Inter Miami",
-      image: "/player-2.png", // Update with your player card image path
-      signalCount: 1156,
+      id: "arda-guler",
+      name: "Arda Güler",
+      position: "CAM",
+      team: "Real Madrid",
+      image: "/7.png",
+      signalCount: 0,
     },
     {
-      id: "player-3",
+      id: "kylian-mbappe",
       name: "Kylian Mbappé",
-      position: "FW",
-      team: "Paris Saint-Germain",
-      image: "/player-3.png", // Update with your player card image path
-      signalCount: 987,
+      position: "ST",
+      team: "Real Madrid",
+      image: "/8.png",
+      signalCount: 0,
     },
     {
-      id: "player-4",
-      name: "Erling Haaland",
-      position: "FW",
-      team: "Manchester City",
-      image: "/player-4.png", // Update with your player card image path
-      signalCount: 856,
+      id: "kenan-yildiz",
+      name: "Kenan Yıldız",
+      position: "LW",
+      team: "Juventus",
+      image: "/9.png",
+      signalCount: 0,
     },
   ];
 
