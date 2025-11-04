@@ -65,8 +65,25 @@ export async function POST(request: NextRequest) {
 
     if (matches.length === 0) {
       return NextResponse.json(
-        { error: "No matches found from API" },
+        {
+          error: "No matches found from API",
+          hint: "Check if NEXT_PUBLIC_FOOTBALL_API_KEY is set in environment variables. Get free API key from https://www.football-data.org/"
+        },
         { status: 404 }
+      );
+    }
+
+    // Check if mock data is being used
+    const isMockData = matches.some(m => [1001, 1002, 1003].includes(m.id));
+    if (isMockData) {
+      return NextResponse.json(
+        {
+          error: "Using mock data - Football API key not configured",
+          message: "NEXT_PUBLIC_FOOTBALL_API_KEY is missing or invalid",
+          hint: "Get a free API key from https://www.football-data.org/ and add it to Vercel Environment Variables",
+          mockMatches: matches.length
+        },
+        { status: 400 }
       );
     }
 
