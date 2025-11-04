@@ -208,70 +208,78 @@ export function MatchCard({ match, index }: MatchCardProps) {
         </div>
       </div>
 
-      {/* Signal Buttons - Compact & Equal Height */}
-      {/* CRITICAL: Only show buttons if NOT already signaled and wallet is connected */}
-      {isActive && !hasSignaled && walletConnected && (
-        <div className="grid grid-cols-2 gap-3">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => handleSignal(1)}
-            disabled={isPending || hasSignaled}
-            className={cn(
-              "relative overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed h-12 flex items-center justify-center",
-              {
-                "animate-pulse": selectedTeam === 1 && isPending,
-              }
-            )}
-          >
-            {isPending && selectedTeam === 1 ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              <div className="flex items-center justify-center gap-2">
-                <TrendingUp className="w-4 h-4" />
-                <span className="text-sm">Signal</span>
-              </div>
-            )}
-          </motion.button>
+      {/* Signal Buttons - ALWAYS VISIBLE FOR ACTIVE MATCHES */}
+      {isActive && (
+        <div className="space-y-3">
+          {/* Buttons */}
+          <div className="grid grid-cols-2 gap-3">
+            <motion.button
+              whileHover={!hasSignaled && walletConnected ? { scale: 1.05 } : {}}
+              whileTap={!hasSignaled && walletConnected ? { scale: 0.95 } : {}}
+              onClick={() => handleSignal(1)}
+              disabled={isPending || hasSignaled || !walletConnected}
+              className={cn(
+                "relative overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed h-12 flex items-center justify-center",
+                {
+                  "animate-pulse": selectedTeam === 1 && isPending,
+                }
+              )}
+            >
+              {isPending && selectedTeam === 1 ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <div className="flex items-center justify-center gap-2">
+                  <TrendingUp className="w-4 h-4" />
+                  <span className="text-sm">Signal {match.teamA}</span>
+                </div>
+              )}
+            </motion.button>
 
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => handleSignal(2)}
-            disabled={isPending || hasSignaled}
-            className={cn(
-              "relative overflow-hidden bg-gradient-to-br from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed h-12 flex items-center justify-center",
-              {
-                "animate-pulse": selectedTeam === 2 && isPending,
-              }
-            )}
-          >
-            {isPending && selectedTeam === 2 ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              <div className="flex items-center justify-center gap-2">
-                <TrendingUp className="w-4 h-4" />
-                <span className="text-sm">Signal</span>
-              </div>
-            )}
-          </motion.button>
-        </div>
-      )}
-
-      {/* Already Signaled Message */}
-      {hasSignaled && (
-        <div className="glass-card p-4 text-center border-2 border-blue-200">
-          <div className="flex items-center justify-center gap-2 text-blue-700 font-semibold">
-            <CheckCircle2 className="w-5 h-5" />
-            <span>You signaled for {teamChoice === 1 ? match.teamA : match.teamB}</span>
+            <motion.button
+              whileHover={!hasSignaled && walletConnected ? { scale: 1.05 } : {}}
+              whileTap={!hasSignaled && walletConnected ? { scale: 0.95 } : {}}
+              onClick={() => handleSignal(2)}
+              disabled={isPending || hasSignaled || !walletConnected}
+              className={cn(
+                "relative overflow-hidden bg-gradient-to-br from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed h-12 flex items-center justify-center",
+                {
+                  "animate-pulse": selectedTeam === 2 && isPending,
+                }
+              )}
+            >
+              {isPending && selectedTeam === 2 ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <div className="flex items-center justify-center gap-2">
+                  <TrendingUp className="w-4 h-4" />
+                  <span className="text-sm">Signal {match.teamB}</span>
+                </div>
+              )}
+            </motion.button>
           </div>
+
+          {/* Status Messages */}
+          {hasSignaled && (
+            <div className="glass-card p-3 text-center border-2 border-green-200 bg-green-50">
+              <div className="flex items-center justify-center gap-2 text-green-700 font-semibold text-sm">
+                <CheckCircle2 className="w-4 h-4" />
+                <span>You signaled for {teamChoice === 1 ? match.teamA : match.teamB}</span>
+              </div>
+            </div>
+          )}
+
+          {!walletConnected && (
+            <div className="glass-card p-3 text-center border border-blue-200 bg-blue-50">
+              <p className="text-xs text-gray-600">Connect your wallet to signal</p>
+            </div>
+          )}
         </div>
       )}
 
-      {/* Connect Wallet Message */}
-      {!walletConnected && isActive && (
-        <div className="glass-card p-4 text-center border border-blue-200">
-          <p className="text-sm text-gray-600">Connect your wallet to signal</p>
+      {/* Match Finished - No Buttons */}
+      {!isActive && (
+        <div className="glass-card p-4 text-center border border-gray-200 bg-gray-50">
+          <p className="text-sm text-gray-600 font-semibold">Match Finished</p>
         </div>
       )}
 

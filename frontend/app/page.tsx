@@ -37,8 +37,8 @@ export default function HomePage() {
   // Real Player Cards - Young Stars Edition
   const bestPlayers = [
     {
-      id: "lamin-yamal",
-      name: "Lamin Yamal",
+      id: "lamine-yamal",
+      name: "Lamine Yamal",
       position: "RW",
       team: "FC Barcelona",
       image: "/6.png",

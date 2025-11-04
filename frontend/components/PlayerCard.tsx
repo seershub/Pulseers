@@ -62,66 +62,64 @@ export function PlayerCard({ player, index, onSignal, hasSignaled }: PlayerCardP
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: index * 0.1 }}
-      className="relative flex-shrink-0 w-52 md:w-60"
+      transition={{ duration: 0.3, delay: index * 0.05 }}
+      className="relative flex-shrink-0 w-48 md:w-52"
     >
       <div className={cn(
-        "relative bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl overflow-hidden shadow-xl transition-all duration-300",
-        "hover:shadow-2xl hover:scale-105 border-2 border-white/20"
+        "relative bg-white rounded-2xl overflow-hidden shadow-lg transition-all duration-300",
+        "hover:shadow-2xl hover:scale-105 border-2 border-blue-100"
       )}>
-        {/* Player Image - Transparent PNG on top */}
-        <div className="relative h-56 md:h-64 overflow-hidden pt-4">
+        {/* Player Image - Full Size Transparent PNG */}
+        <div className="relative h-64 md:h-72 bg-gradient-to-br from-blue-50 to-blue-100 overflow-hidden">
           {player.image ? (
             <Image
               src={player.image}
               alt={player.name}
               fill
-              className="object-contain object-top transition-transform duration-300 hover:scale-110"
+              className="object-cover object-top transition-transform duration-300 hover:scale-110"
               priority
               onError={(e: any) => {
                 e.currentTarget.style.display = "none";
               }}
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center">
+            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-400 to-blue-600">
               <span className="text-white text-5xl font-black">{player.name.charAt(0)}</span>
             </div>
           )}
+
+          {/* Position Badge - Top Right */}
+          <div className="absolute top-3 right-3 px-3 py-1 bg-blue-600 rounded-full shadow-lg">
+            <span className="text-xs font-black text-white">{player.position}</span>
+          </div>
         </div>
 
-        {/* Player Info Section */}
-        <div className="relative px-4 pb-4 pt-2 bg-white/10 backdrop-blur-md">
-          {/* Position Badge - Top Left */}
-          <div className="absolute -top-3 left-4 px-3 py-1 bg-yellow-400 rounded-full shadow-lg">
-            <span className="text-xs font-black text-gray-900">{player.position}</span>
-          </div>
-
+        {/* Player Info Section - White Background */}
+        <div className="p-4 bg-white">
           {/* Player Name & Team */}
-          <div className="mt-4 mb-3">
-            <h3 className="font-black text-white text-base md:text-lg mb-0.5 line-clamp-1">{player.name}</h3>
-            <p className="text-xs text-white/80 line-clamp-1">{player.team}</p>
-          </div>
+          <h3 className="font-black text-gray-900 text-base mb-1 line-clamp-1">{player.name}</h3>
+          <p className="text-xs text-gray-600 mb-3 line-clamp-1">{player.team}</p>
 
           {/* Signal Stats */}
-          <div className="flex items-center gap-2 mb-3 px-3 py-2 bg-white/20 backdrop-blur-sm rounded-lg">
-            <TrendingUp className="w-4 h-4 text-yellow-400" />
-            <span className="text-sm font-bold text-white">{player.signalCount}</span>
-            <span className="text-xs text-white/70">signals</span>
+          <div className="flex items-center gap-2 mb-3 px-3 py-2 bg-blue-50 rounded-lg">
+            <TrendingUp className="w-4 h-4 text-blue-600" />
+            <span className="text-sm font-bold text-gray-900">{player.signalCount}</span>
+            <span className="text-xs text-gray-600">signals</span>
           </div>
 
           {/* Signal Button */}
           {isConnected && !hasSignaled && (
             <motion.button
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               onClick={handleSignal}
               disabled={isPending}
               className={cn(
-                "w-full py-3 px-4 rounded-xl font-bold text-sm transition-all",
-                "bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600",
-                "text-gray-900 shadow-lg hover:shadow-xl",
+                "w-full py-2.5 px-4 rounded-xl font-bold text-sm transition-all",
+                "bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600",
+                "text-white shadow-md hover:shadow-lg",
                 "disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2",
-                isSuccess && "from-green-400 to-green-500"
+                isSuccess && "from-green-500 to-green-600"
               )}
             >
               {isPending ? (
@@ -137,7 +135,7 @@ export function PlayerCard({ player, index, onSignal, hasSignaled }: PlayerCardP
               ) : (
                 <>
                   <TrendingUp className="w-4 h-4" />
-                  <span>Signal Player</span>
+                  <span>Signal</span>
                 </>
               )}
             </motion.button>
@@ -145,18 +143,18 @@ export function PlayerCard({ player, index, onSignal, hasSignaled }: PlayerCardP
 
           {/* Already Signaled */}
           {hasSignaled && (
-            <div className="w-full py-3 px-4 rounded-xl bg-green-500/20 backdrop-blur-sm border-2 border-green-400/50">
+            <div className="w-full py-2.5 px-4 rounded-xl bg-green-50 border-2 border-green-200">
               <div className="flex items-center justify-center gap-2">
-                <CheckCircle2 className="w-5 h-5 text-green-400" />
-                <span className="text-sm font-bold text-green-100">Already Signaled</span>
+                <CheckCircle2 className="w-4 h-4 text-green-600" />
+                <span className="text-xs font-bold text-green-700">Signaled</span>
               </div>
             </div>
           )}
 
           {/* Not Connected */}
           {!isConnected && (
-            <div className="w-full py-3 px-4 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20">
-              <span className="text-xs text-white/80 block text-center">Connect Wallet to Signal</span>
+            <div className="w-full py-2.5 px-4 rounded-xl bg-gray-100">
+              <span className="text-xs text-gray-600 block text-center">Connect Wallet</span>
             </div>
           )}
         </div>
