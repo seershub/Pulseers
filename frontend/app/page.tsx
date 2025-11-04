@@ -34,22 +34,14 @@ export default function HomePage() {
     init();
   }, []);
 
-  // Real Player Cards - Young Stars Edition
+  // Real Player Cards - Correct Image Mapping
   const bestPlayers = [
-    {
-      id: "lamine-yamal",
-      name: "Lamine Yamal",
-      position: "RW",
-      team: "FC Barcelona",
-      image: "/6.png",
-      signalCount: 0,
-    },
     {
       id: "arda-guler",
       name: "Arda Güler",
       position: "CAM",
       team: "Real Madrid",
-      image: "/7.png",
+      image: "/6.png", // 6.png = Arda Güler
       signalCount: 0,
     },
     {
@@ -57,7 +49,15 @@ export default function HomePage() {
       name: "Kylian Mbappé",
       position: "ST",
       team: "Real Madrid",
-      image: "/8.png",
+      image: "/7.png", // 7.png = Mbappé
+      signalCount: 0,
+    },
+    {
+      id: "lamine-yamal",
+      name: "Lamine Yamal",
+      position: "RW",
+      team: "FC Barcelona",
+      image: "/8.png", // 8.png = Yamal
       signalCount: 0,
     },
     {
@@ -65,7 +65,7 @@ export default function HomePage() {
       name: "Kenan Yıldız",
       position: "LW",
       team: "Juventus",
-      image: "/9.png",
+      image: "/9.png", // 9.png = Kenan Yıldız
       signalCount: 0,
     },
   ];
@@ -91,10 +91,10 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col safe-area-top safe-area-bottom overflow-x-hidden w-full">
+    <div className="min-h-screen flex flex-col safe-area-top safe-area-bottom">
       <Header />
 
-      <main className="flex-1 w-full mx-auto px-4 max-w-6xl overflow-x-hidden">
+      <main className="flex-1 w-full mx-auto px-4 max-w-6xl">
         {/* Hero Section - Modern & Compact */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
