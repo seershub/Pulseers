@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { motion } from "framer-motion";
-import { Star } from "lucide-react";
+import { Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { PlayerCard } from "./PlayerCard";
 import { useWallet } from "@/hooks/useWallet";
 
@@ -24,6 +24,17 @@ interface PlayerCarouselProps {
 export function PlayerCarousel({ players, onPlayerSignal, userSignaledPlayers }: PlayerCarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const { isConnected } = useWallet();
+
+  const scroll = (direction: 'left' | 'right') => {
+    if (scrollRef.current) {
+      const scrollAmount = 280; // width of card + gap
+      const newScrollLeft = scrollRef.current.scrollLeft + (direction === 'left' ? -scrollAmount : scrollAmount);
+      scrollRef.current.scrollTo({
+        left: newScrollLeft,
+        behavior: 'smooth'
+      });
+    }
+  };
 
   if (players.length === 0) {
     return null;
@@ -57,6 +68,21 @@ export function PlayerCarousel({ players, onPlayerSignal, userSignaledPlayers }:
 
       {/* Scrollable Carousel - Enhanced */}
       <div className="relative -mx-4 px-4 md:mx-0 md:px-0">
+        {/* Scroll Buttons - Desktop Only */}
+        <button
+          onClick={() => scroll('left')}
+          className="hidden md:flex absolute left-2 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white border-2 border-blue-200 rounded-full items-center justify-center shadow-lg hover:bg-blue-50 hover:border-blue-300 transition-all"
+        >
+          <ChevronLeft className="w-6 h-6 text-blue-600" />
+        </button>
+
+        <button
+          onClick={() => scroll('right')}
+          className="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white border-2 border-blue-200 rounded-full items-center justify-center shadow-lg hover:bg-blue-50 hover:border-blue-300 transition-all"
+        >
+          <ChevronRight className="w-6 h-6 text-blue-600" />
+        </button>
+
         {/* Scroll Container */}
         <div
           ref={scrollRef}
@@ -78,9 +104,9 @@ export function PlayerCarousel({ players, onPlayerSignal, userSignaledPlayers }:
           ))}
         </div>
 
-        {/* Gradient Fade on edges - Hidden on mobile for better UX */}
-        <div className="hidden md:block absolute left-0 top-0 bottom-6 w-24 bg-gradient-to-r from-gray-50 via-gray-50/80 to-transparent pointer-events-none" />
-        <div className="hidden md:block absolute right-0 top-0 bottom-6 w-24 bg-gradient-to-l from-gray-50 via-gray-50/80 to-transparent pointer-events-none" />
+        {/* Gradient Fade on edges */}
+        <div className="hidden md:block absolute left-0 top-0 bottom-6 w-20 bg-gradient-to-r from-gray-50 via-gray-50/80 to-transparent pointer-events-none" />
+        <div className="hidden md:block absolute right-0 top-0 bottom-6 w-20 bg-gradient-to-l from-gray-50 via-gray-50/80 to-transparent pointer-events-none" />
       </div>
 
       {/* Scroll hint for mobile */}

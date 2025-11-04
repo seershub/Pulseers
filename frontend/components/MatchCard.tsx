@@ -18,22 +18,21 @@ interface MatchCardProps {
 }
 
 export function MatchCard({ match, index }: MatchCardProps) {
-  const { isConnected, address } = useWallet();
+  const { isConnected } = useWallet();
   const { signal, isPending, isSuccess } = useSignal();
   const { hasSignaled, teamChoice, refetch } = useUserSignal(match.matchId);
   const [selectedTeam, setSelectedTeam] = useState<1 | 2 | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
 
   // Wallet is automatically detected by useWallet hook
-  // Both connected AND address must be available
-  const walletConnected = isConnected && !!address;
+  const walletConnected = isConnected;
 
   const totalSignals = Number(match.signalsTeamA) + Number(match.signalsTeamB);
   const isActive = match.status !== "FINISHED";
 
   const handleSignal = async (teamId: 1 | 2) => {
     if (!walletConnected) {
-      alert("Please wait for wallet to connect...");
+      alert("Please connect your wallet first");
       return;
     }
 
@@ -226,11 +225,6 @@ export function MatchCard({ match, index }: MatchCardProps) {
             >
               {isPending && selectedTeam === 1 ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
-              ) : !walletConnected ? (
-                <div className="flex items-center justify-center gap-2">
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span className="text-xs">Connecting...</span>
-                </div>
               ) : (
                 <div className="flex items-center justify-center gap-2">
                   <TrendingUp className="w-4 h-4" />
@@ -253,11 +247,6 @@ export function MatchCard({ match, index }: MatchCardProps) {
             >
               {isPending && selectedTeam === 2 ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
-              ) : !walletConnected ? (
-                <div className="flex items-center justify-center gap-2">
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span className="text-xs">Connecting...</span>
-                </div>
               ) : (
                 <div className="flex items-center justify-center gap-2">
                   <TrendingUp className="w-4 h-4" />

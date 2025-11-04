@@ -24,16 +24,13 @@ interface PlayerCardProps {
 }
 
 export function PlayerCard({ player, index, onSignal, hasSignaled }: PlayerCardProps) {
-  const { isConnected, address } = useWallet();
+  const { isConnected } = useWallet();
   const [isPending, setIsPending] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  // Both connected AND address must be available
-  const canSignal = isConnected && !!address;
-
   const handleSignal = async () => {
-    if (!canSignal) {
-      alert("Please wait for wallet to connect...");
+    if (!isConnected) {
+      alert("Please connect your wallet first");
       return;
     }
 
@@ -110,13 +107,13 @@ export function PlayerCard({ player, index, onSignal, hasSignaled }: PlayerCardP
             <span className="text-xs text-gray-600">signals</span>
           </div>
 
-          {/* Signal Button - Always show when not signaled */}
-          {!hasSignaled && (
+          {/* Signal Button */}
+          {isConnected && !hasSignaled && (
             <motion.button
-              whileHover={canSignal ? { scale: 1.02 } : {}}
-              whileTap={canSignal ? { scale: 0.98 } : {}}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               onClick={handleSignal}
-              disabled={!canSignal || isPending}
+              disabled={isPending}
               className={cn(
                 "w-full py-2.5 px-4 rounded-xl font-bold text-sm transition-all",
                 "bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600",
@@ -135,11 +132,6 @@ export function PlayerCard({ player, index, onSignal, hasSignaled }: PlayerCardP
                   <CheckCircle2 className="w-4 h-4" />
                   <span>Success!</span>
                 </>
-              ) : !canSignal ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Connecting...</span>
-                </>
               ) : (
                 <>
                   <TrendingUp className="w-4 h-4" />
@@ -156,6 +148,13 @@ export function PlayerCard({ player, index, onSignal, hasSignaled }: PlayerCardP
                 <CheckCircle2 className="w-4 h-4 text-green-600" />
                 <span className="text-xs font-bold text-green-700">Signaled</span>
               </div>
+            </div>
+          )}
+
+          {/* Not Connected */}
+          {!isConnected && (
+            <div className="w-full py-2.5 px-4 rounded-xl bg-gray-100">
+              <span className="text-xs text-gray-600 block text-center">Connect Wallet</span>
             </div>
           )}
         </div>
