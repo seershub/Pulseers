@@ -173,20 +173,23 @@ export function usePlayerSignal() {
       console.log("🔍 View on BaseScan: https://basescan.org/tx/" + txHash);
       setHash(txHash);
 
-      // Wait for confirmation
-      console.log("⏳ Waiting for confirmation on Base Mainnet...");
-      const receipt = await publicClient.waitForTransactionReceipt({
+      // CRITICAL: Set success immediately after transaction is sent
+      // Don't wait for confirmation - it can take 30-60 seconds!
+      console.log("✅ Setting success state IMMEDIATELY (not waiting for confirmation)");
+      setIsSuccess(true);
+      setIsPending(false);
+
+      // Wait for confirmation in background (non-blocking)
+      publicClient.waitForTransactionReceipt({
         hash: txHash,
         confirmations: 1,
         timeout: 60_000,
+      }).then((receipt) => {
+        console.log("✅ Player signal confirmed on-chain!");
+        console.log("📋 Receipt:", receipt);
+      }).catch((err) => {
+        console.warn("⚠️ Confirmation wait failed (transaction likely still succeeded):", err.message);
       });
-
-      console.log("✅ Player signal transaction confirmed!");
-      console.log("📋 Receipt:", receipt);
-      console.log("🔍 BaseScan: https://basescan.org/tx/" + txHash);
-
-      setIsSuccess(true);
-      setIsPending(false);
 
       return txHash;
     } catch (err: any) {
