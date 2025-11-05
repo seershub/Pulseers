@@ -9,6 +9,7 @@ import { TrendingUp, Zap, CheckCircle, Trophy } from "lucide-react";
 import { sdk } from "@/lib/farcaster-sdk";
 import { useWallet } from "@/hooks/useWallet";
 import { usePlayerSignal } from "@/hooks/usePlayerSignal";
+import { usePlayerMatches } from "@/hooks/usePlayerMatches";
 
 /**
  * Main Page Component
@@ -19,6 +20,9 @@ export default function HomePage() {
   const { isConnected } = useWallet();
   const [userSignaledPlayers, setUserSignaledPlayers] = useState<Set<string>>(new Set());
   const { signal: signalPlayer, isPending: isPlayerSignalPending } = usePlayerSignal();
+
+  // CRITICAL: Fetch player matches with REAL signal counts from contract
+  const { players: bestPlayers, isLoading: playersLoading, refetch: refetchPlayers } = usePlayerMatches();
 
   useEffect(() => {
     // Initialize Farcaster SDK
@@ -33,49 +37,21 @@ export default function HomePage() {
     init();
   }, []);
 
-  // Real Player Cards - Correct Image Mapping
-  const bestPlayers = [
-    {
-      id: "arda-guler",
-      name: "Arda Güler",
-      position: "CAM",
-      team: "Real Madrid",
-      image: "/6.png", // 6.png = Arda Güler
-      signalCount: 0,
-    },
-    {
-      id: "kylian-mbappe",
-      name: "Kylian Mbappé",
-      position: "ST",
-      team: "Real Madrid",
-      image: "/7.png", // 7.png = Mbappé
-      signalCount: 0,
-    },
-    {
-      id: "lamine-yamal",
-      name: "Lamine Yamal",
-      position: "RW",
-      team: "FC Barcelona",
-      image: "/8.png", // 8.png = Yamal
-      signalCount: 0,
-    },
-    {
-      id: "kenan-yildiz",
-      name: "Kenan Yıldız",
-      position: "LW",
-      team: "Juventus",
-      image: "/9.png", // 9.png = Kenan Yıldız
-      signalCount: 0,
-    },
-  ];
-
   const handlePlayerSignal = async (playerId: string) => {
     try {
+      console.log("🎯 Handling player signal:", playerId);
+
       const txHash = await signalPlayer(playerId);
       console.log("✅ Player signal successful, txHash:", txHash);
 
       // Update local state after successful on-chain signal
       setUserSignaledPlayers(prev => new Set(prev).add(playerId));
+
+      // CRITICAL: Refetch player signal counts to update UI
+      console.log("🔄 Refetching player signal counts...");
+      setTimeout(() => {
+        refetchPlayers();
+      }, 2000); // Wait 2 seconds for blockchain indexing
     } catch (error: any) {
       console.error("❌ Player signal error:", error);
       throw error;

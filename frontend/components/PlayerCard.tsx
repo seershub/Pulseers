@@ -1,11 +1,12 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { TrendingUp, Loader2, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useWallet } from "@/hooks/useWallet";
+import { createPortal } from "react-dom";
 
 interface Player {
   id: string;
@@ -27,6 +28,16 @@ export function PlayerCard({ player, index, onSignal, hasSignaled }: PlayerCardP
   const { isConnected } = useWallet();
   const [isPending, setIsPending] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    console.log("✅ PlayerCard mounted:", player.name);
+  }, [player.name]);
+
+  useEffect(() => {
+    console.log("🔍 PLAYER STATE - showSuccess:", showSuccess, "isPending:", isPending, "player:", player.name);
+  }, [showSuccess, isPending, player.name]);
 
   const handleSignal = async () => {
     if (!isConnected) {
@@ -184,65 +195,80 @@ export function PlayerCard({ player, index, onSignal, hasSignaled }: PlayerCardP
         </div>
       </div>
 
-      {/* Success Animation Popup - Full Screen */}
-      {showSuccess && (
-        <motion.div
-          key="player-success-popup"
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0, opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm"
-          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
-          onClick={() => {
-            console.log("🖱️ Clicked outside player popup - closing");
-            setShowSuccess(false);
-          }}
-        >
-          <motion.div
-            initial={{ scale: 0.8, y: 20 }}
-            animate={{ scale: 1, y: 0 }}
-            transition={{ type: "spring", stiffness: 300, damping: 25 }}
-            className="glass-card p-8 max-w-md mx-4 shadow-2xl border-2 border-green-200 bg-gradient-to-br from-white to-green-50/30"
-            onClick={(e) => {
-              console.log("🖱️ Clicked inside player popup - preventing close");
-              e.stopPropagation();
-            }}
-          >
+      {/* Success Animation Popup - Portal to document.body */}
+      {mounted && createPortal(
+        <AnimatePresence mode="wait">
+          {showSuccess && (
             <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: [0, 1.2, 1] }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="mb-4"
+              key={`player-success-popup-${player.id}`}
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                margin: 0,
+                padding: 0,
+                width: '100vw',
+                height: '100vh'
+              }}
+              onClick={() => {
+                console.log("🖱️ PLAYER POPUP - Clicked outside - closing");
+                setShowSuccess(false);
+              }}
             >
-              <CheckCircle2 className="w-20 h-20 text-green-500 mx-auto drop-shadow-lg" />
+              <motion.div
+                initial={{ scale: 0.8, y: 20 }}
+                animate={{ scale: 1, y: 0 }}
+                transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                className="bg-white p-8 max-w-md mx-4 rounded-3xl shadow-2xl border-4 border-green-400"
+                onClick={(e) => {
+                  console.log("🖱️ PLAYER POPUP - Clicked inside - preventing close");
+                  e.stopPropagation();
+                }}
+              >
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: [0, 1.2, 1] }}
+                  transition={{ duration: 0.5, delay: 0.1 }}
+                  className="mb-4 flex justify-center"
+                >
+                  <CheckCircle2 className="w-24 h-24 text-green-500 drop-shadow-2xl" />
+                </motion.div>
+                <motion.h3
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="text-3xl font-black text-green-600 text-center mb-3"
+                >
+                  🎉 SIGNAL BAŞARILI! 🎉
+                </motion.h3>
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.4 }}
+                  className="text-base text-gray-700 text-center mb-2 font-semibold"
+                >
+                  {player.name} için tahmin gönderildi!
+                </motion.p>
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5 }}
+                  className="text-sm text-gray-600 text-center"
+                >
+                  ✅ Base Mainnet'te onaylandı
+                </motion.p>
+              </motion.div>
             </motion.div>
-            <motion.h3
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="text-2xl font-black gradient-text text-center mb-2"
-            >
-              Player Signaled!
-            </motion.h3>
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
-              className="text-sm text-gray-600 text-center mb-2"
-            >
-              You signaled for {player.name}
-            </motion.p>
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              className="text-xs text-gray-500 text-center"
-            >
-              Transaction confirmed on Base Mainnet
-            </motion.p>
-          </motion.div>
-        </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body
       )}
     </motion.div>
   );

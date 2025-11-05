@@ -47,8 +47,18 @@ export async function GET() {
 
       console.log("✅ Fetched matches:", matches.length);
 
-      // Convert BigInt to string for JSON serialization
-      const serializedMatches = matches.map((match: any) => ({
+      // CRITICAL: Filter out player matches (matchId >= 9000000000)
+      // Player matches should ONLY appear in "Signal Top Players" section, NOT in match list
+      const PLAYER_MATCH_ID_THRESHOLD = 9000000000n;
+
+      const regularMatches = matches.filter((match: any) => match.matchId < PLAYER_MATCH_ID_THRESHOLD);
+      const playerMatches = matches.filter((match: any) => match.matchId >= PLAYER_MATCH_ID_THRESHOLD);
+
+      console.log("🏟️  Regular matches:", regularMatches.length);
+      console.log("⭐ Player matches (filtered out):", playerMatches.length);
+
+      // Convert BigInt to string for JSON serialization - ONLY regular matches
+      const serializedMatches = regularMatches.map((match: any) => ({
         matchId: match.matchId.toString(),
         teamA: match.teamA,
         teamB: match.teamB,
