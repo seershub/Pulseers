@@ -51,33 +51,47 @@ export function MatchCard({ match, index, onSignalSuccess }: MatchCardProps) {
     setSelectedTeam(teamId);
 
     try {
+      console.log("🎯 Starting signal transaction...");
       const txHash = await signal(match.matchId, teamId);
       console.log("✅ Signal successful, txHash:", txHash);
 
-      // Show success popup immediately
+      // IMPORTANT: Show success popup IMMEDIATELY
       setShowSuccess(true);
+      console.log("✅ Success popup shown");
 
-      // Wait a bit for transaction to be indexed
+      // Wait for transaction to be indexed
+      console.log("⏳ Waiting 2 seconds for blockchain indexing...");
       await new Promise(resolve => setTimeout(resolve, 2000));
 
       // Refetch user signal state
+      console.log("🔄 Refetching user signal state...");
       await refetch();
 
       // CRITICAL: Refetch all matches to update signal counts
       if (onSignalSuccess) {
+        console.log("🔄 Refetching all matches...");
         onSignalSuccess();
       }
 
-      // Hide success popup after 3 seconds
+      // Hide success popup after 3 seconds total (1 second remaining)
       setTimeout(() => {
+        console.log("👋 Hiding success popup");
         setShowSuccess(false);
         setSelectedTeam(null);
-      }, 3000);
+      }, 1000);
     } catch (error: any) {
-      console.error("Signal error:", error);
+      console.error("❌ Signal error:", error);
       setShowSuccess(false);
-      alert(error.message || "Failed to submit signal");
       setSelectedTeam(null);
+
+      // Better error messages
+      if (error.message?.includes("rejected")) {
+        alert("Transaction was rejected. Please try again.");
+      } else if (error.message?.includes("Match does not exist")) {
+        alert("This match has not been registered in the contract yet. Please contact admin.");
+      } else {
+        alert(error.message || "Failed to submit signal. Please try again.");
+      }
     }
   };
 

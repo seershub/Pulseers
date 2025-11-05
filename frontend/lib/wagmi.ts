@@ -44,9 +44,9 @@ export const config = createConfig({
   connectors: [
     coinbaseWallet({
       appName: "Pulseers",
-      preference: "smartWalletOnly", // Prefer Smart Wallet for Paymaster support
+      preference: "all", // Support ALL wallets: Smart Wallet, EOA, MetaMask, Rainbow, etc.
     }),
-    injected(),
+    injected(), // MetaMask, Rainbow, Zerion, etc.
   ],
   transports: {
     [base.id]: http(getBaseRpcUrl()),
