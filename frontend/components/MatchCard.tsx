@@ -24,6 +24,7 @@ export function MatchCard({ match, index, onSignalSuccess }: MatchCardProps) {
   const { hasSignaled, teamChoice, refetch } = useUserSignal(match.matchId);
   const [selectedTeam, setSelectedTeam] = useState<1 | 2 | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [successTeam, setSuccessTeam] = useState<1 | 2 | null>(null);
 
   // Wallet is automatically detected by useWallet hook
   const walletConnected = isConnected;
@@ -54,14 +55,17 @@ export function MatchCard({ match, index, onSignalSuccess }: MatchCardProps) {
       console.log("🎯 Starting signal transaction...");
       console.log("📝 Match ID:", match.matchId.toString());
       console.log("🏆 Team ID:", teamId);
+      console.log("🔍 Current states - isPending:", isPending, "showSuccess:", showSuccess);
 
       const txHash = await signal(match.matchId, teamId);
       console.log("✅ Signal transaction successful!");
       console.log("📤 TX Hash:", txHash);
 
-      // IMPORTANT: Show success popup IMMEDIATELY after transaction
-      console.log("🎉 Showing success popup NOW");
+      // CRITICAL: Set success states IMMEDIATELY
+      console.log("🎉 Setting success states NOW!");
+      setSuccessTeam(teamId);
       setShowSuccess(true);
+      console.log("✅ Success states set - showSuccess: true, successTeam:", teamId);
 
       // Wait for transaction to be indexed on blockchain
       console.log("⏳ Waiting 2 seconds for blockchain indexing...");
@@ -82,6 +86,7 @@ export function MatchCard({ match, index, onSignalSuccess }: MatchCardProps) {
       setTimeout(() => {
         console.log("👋 Hiding success popup");
         setShowSuccess(false);
+        setSuccessTeam(null);
         setSelectedTeam(null);
       }, 3000);
     } catch (error: any) {
@@ -89,8 +94,9 @@ export function MatchCard({ match, index, onSignalSuccess }: MatchCardProps) {
       console.error("❌ Error message:", error.message);
       console.error("❌ Error code:", error.code);
 
-      // Reset states on error
+      // Reset ALL states on error
       setShowSuccess(false);
+      setSuccessTeam(null);
       setSelectedTeam(null);
 
       // Better error messages based on error type
@@ -315,15 +321,19 @@ export function MatchCard({ match, index, onSignalSuccess }: MatchCardProps) {
       )}
 
       {/* Success Animation Popup - Shows after successful signal */}
-      {showSuccess && selectedTeam && (
+      {showSuccess && successTeam && (
         <motion.div
+          key="success-popup"
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0, opacity: 0 }}
           transition={{ duration: 0.3 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm"
+          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
           onClick={() => {
+            console.log("🖱️ Clicked outside popup - closing");
             setShowSuccess(false);
+            setSuccessTeam(null);
             setSelectedTeam(null);
           }}
         >
@@ -332,7 +342,10 @@ export function MatchCard({ match, index, onSignalSuccess }: MatchCardProps) {
             animate={{ scale: 1, y: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
             className="glass-card p-8 max-w-md mx-4 shadow-2xl border-2 border-green-200 bg-gradient-to-br from-white to-green-50/30"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              console.log("🖱️ Clicked inside popup - preventing close");
+              e.stopPropagation();
+            }}
           >
             <motion.div
               initial={{ scale: 0 }}
@@ -356,7 +369,7 @@ export function MatchCard({ match, index, onSignalSuccess }: MatchCardProps) {
               transition={{ delay: 0.4 }}
               className="text-sm text-gray-600 text-center mb-2"
             >
-              You signaled for {selectedTeam === 1 ? match.teamA : match.teamB}
+              You signaled for {successTeam === 1 ? match.teamA : match.teamB}
             </motion.p>
             <motion.p
               initial={{ opacity: 0 }}
@@ -364,7 +377,7 @@ export function MatchCard({ match, index, onSignalSuccess }: MatchCardProps) {
               transition={{ delay: 0.5 }}
               className="text-xs text-gray-500 text-center"
             >
-              Transaction confirmed on Base Mainnet
+              Transaction confirmed on Base Mainnet ✅
             </motion.p>
           </motion.div>
         </motion.div>

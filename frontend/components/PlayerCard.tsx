@@ -46,15 +46,20 @@ export function PlayerCard({ player, index, onSignal, hasSignaled }: PlayerCardP
 
     try {
       console.log("🎯 Signaling player:", player.id);
-      await onSignal(player.id);
-      console.log("✅ Player signal successful!");
+      console.log("🔍 Player name:", player.name);
 
-      // Show success popup
+      await onSignal(player.id);
+
+      console.log("✅ Player signal successful!");
+      console.log("🎉 Setting success state NOW!");
+
+      // CRITICAL: Show success popup IMMEDIATELY
       setShowSuccess(true);
-      console.log("🎉 Showing success popup");
+      console.log("✅ Success state set - showSuccess: true");
 
       // Auto-hide after 3 seconds
       setTimeout(() => {
+        console.log("👋 Hiding player success popup");
         setShowSuccess(false);
       }, 3000);
     } catch (error: any) {
@@ -182,19 +187,27 @@ export function PlayerCard({ player, index, onSignal, hasSignaled }: PlayerCardP
       {/* Success Animation Popup - Full Screen */}
       {showSuccess && (
         <motion.div
+          key="player-success-popup"
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0, opacity: 0 }}
           transition={{ duration: 0.3 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-          onClick={() => setShowSuccess(false)}
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm"
+          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
+          onClick={() => {
+            console.log("🖱️ Clicked outside player popup - closing");
+            setShowSuccess(false);
+          }}
         >
           <motion.div
             initial={{ scale: 0.8, y: 20 }}
             animate={{ scale: 1, y: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
             className="glass-card p-8 max-w-md mx-4 shadow-2xl border-2 border-green-200 bg-gradient-to-br from-white to-green-50/30"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              console.log("🖱️ Clicked inside player popup - preventing close");
+              e.stopPropagation();
+            }}
           >
             <motion.div
               initial={{ scale: 0 }}

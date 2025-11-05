@@ -52,21 +52,30 @@ const PLAYER_MATCHES = [
 
 export async function POST(request: NextRequest) {
   try {
-    // Parse request body
-    let body;
+    // Try to parse request body, but allow empty body if env variable is set
+    let body: any = {};
+
     try {
-      body = await request.json();
+      const text = await request.text();
+      if (text && text.trim()) {
+        body = JSON.parse(text);
+      }
     } catch (parseError) {
       console.error("❌ JSON parse error:", parseError);
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Invalid JSON in request body",
-          message: "Please send valid JSON with adminKey field",
-          example: { adminKey: "0x..." }
-        },
-        { status: 400 }
-      );
+      // If there's a parse error AND no env variable, return error
+      if (!process.env.ADMIN_PRIVATE_KEY) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Invalid JSON in request body",
+            message: "Please send valid JSON with adminKey field OR set ADMIN_PRIVATE_KEY env variable",
+            example: { adminKey: "0x..." }
+          },
+          { status: 400 }
+        );
+      }
+      // Otherwise continue with env variable
+      body = {};
     }
 
     const { adminKey } = body;
@@ -74,12 +83,15 @@ export async function POST(request: NextRequest) {
     // Check for admin key from body or environment
     const finalAdminKey = adminKey || process.env.ADMIN_PRIVATE_KEY;
 
+    console.log("🔑 Admin key source:", adminKey ? "request body" : "environment variable");
+
     if (!finalAdminKey) {
       return NextResponse.json(
         {
           success: false,
           error: "adminKey is required",
-          message: "Send adminKey in request body or set ADMIN_PRIVATE_KEY env variable"
+          message: "Send adminKey in request body or set ADMIN_PRIVATE_KEY env variable",
+          envVariableSet: !!process.env.ADMIN_PRIVATE_KEY
         },
         { status: 400 }
       );
