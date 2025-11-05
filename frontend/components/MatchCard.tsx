@@ -15,9 +15,10 @@ import { AnimatedSignalBar } from "./AnimatedSignalBar";
 interface MatchCardProps {
   match: MatchWithStatus;
   index: number;
+  onSignalSuccess?: () => void;
 }
 
-export function MatchCard({ match, index }: MatchCardProps) {
+export function MatchCard({ match, index, onSignalSuccess }: MatchCardProps) {
   const { isConnected } = useWallet();
   const { signal, isPending, isSuccess } = useSignal();
   const { hasSignaled, teamChoice, refetch } = useUserSignal(match.matchId);
@@ -52,16 +53,21 @@ export function MatchCard({ match, index }: MatchCardProps) {
     try {
       const txHash = await signal(match.matchId, teamId);
       console.log("✅ Signal successful, txHash:", txHash);
-      
+
       // Show success popup immediately
       setShowSuccess(true);
-      
+
       // Wait a bit for transaction to be indexed
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Refetch to update hasSignaled state
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // Refetch user signal state
       await refetch();
-      
+
+      // CRITICAL: Refetch all matches to update signal counts
+      if (onSignalSuccess) {
+        onSignalSuccess();
+      }
+
       // Hide success popup after 3 seconds
       setTimeout(() => {
         setShowSuccess(false);

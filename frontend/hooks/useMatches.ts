@@ -90,12 +90,13 @@ export function useMatches() {
  * Hook to get matches filtered by status
  */
 export function useMatchesByStatus(status: "UPCOMING" | "LIVE" | "FINISHED") {
-  const { matches, isLoading } = useMatches();
+  const { matches, isLoading, refetch } = useMatches();
 
   const filteredMatches = matches.filter((match) => match.status === status);
 
   return {
     matches: filteredMatches,
     isLoading,
+    refetch, // Pass through refetch function
   };
 }

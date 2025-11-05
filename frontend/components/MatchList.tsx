@@ -14,7 +14,7 @@ interface MatchListProps {
  * Displays a list of matches filtered by status
  */
 export function MatchList({ status }: MatchListProps) {
-  const { matches, isLoading } = useMatchesByStatus(status);
+  const { matches, isLoading, refetch } = useMatchesByStatus(status);
 
   if (isLoading) {
     return (
@@ -35,7 +35,12 @@ export function MatchList({ status }: MatchListProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {matches.map((match, index) => (
-        <MatchCard key={match.matchId.toString()} match={match} index={index} />
+        <MatchCard
+          key={match.matchId.toString()}
+          match={match}
+          index={index}
+          onSignalSuccess={refetch}
+        />
       ))}
     </div>
   );

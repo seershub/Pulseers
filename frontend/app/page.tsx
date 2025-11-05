@@ -172,13 +172,13 @@ export default function HomePage() {
         >
           {activeFilter === "ALL" ? (
             <>
-              {/* Live Matches */}
+              {/* Signal Best Players Section - MOVED TO TOP */}
               <section className="mb-10">
-                <h2 className="text-xl font-black mb-4 flex items-center gap-2">
-                  <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-                  <span className="gradient-text">Live Now</span>
-                </h2>
-                <MatchList status="LIVE" />
+                <PlayerCarousel
+                  players={bestPlayers}
+                  onPlayerSignal={handlePlayerSignal}
+                  userSignaledPlayers={userSignaledPlayers}
+                />
               </section>
 
               {/* Upcoming Matches */}
@@ -190,6 +190,15 @@ export default function HomePage() {
                 <MatchList status="UPCOMING" />
               </section>
 
+              {/* Live Matches */}
+              <section className="mb-10">
+                <h2 className="text-xl font-black mb-4 flex items-center gap-2">
+                  <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                  <span className="gradient-text">Live Now</span>
+                </h2>
+                <MatchList status="LIVE" />
+              </section>
+
               {/* Finished Matches */}
               <section className="mb-10">
                 <h2 className="text-xl font-black mb-4 flex items-center gap-2">
@@ -198,8 +207,10 @@ export default function HomePage() {
                 </h2>
                 <MatchList status="FINISHED" />
               </section>
-
-              {/* Signal Best Players Section */}
+            </>
+          ) : (
+            <>
+              {/* Show players when on specific filter */}
               <section className="mb-10">
                 <PlayerCarousel
                   players={bestPlayers}
@@ -207,22 +218,11 @@ export default function HomePage() {
                   userSignaledPlayers={userSignaledPlayers}
                 />
               </section>
-            </>
-          ) : (
-            <>
+
+              {/* Show filtered matches */}
               {(activeFilter === "LIVE" || activeFilter === "UPCOMING" || activeFilter === "FINISHED") && (
                 <MatchList status={activeFilter} />
               )}
-              {/* Show players section even when filtered */}
-              {activeFilter === "LIVE" ? (
-                <section className="mt-10">
-                  <PlayerCarousel
-                    players={bestPlayers}
-                    onPlayerSignal={handlePlayerSignal}
-                    userSignaledPlayers={userSignaledPlayers}
-                  />
-                </section>
-              ) : null}
             </>
           )}
         </motion.div>
