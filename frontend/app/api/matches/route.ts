@@ -2,6 +2,11 @@ import { NextResponse } from "next/server";
 import { publicClient, getContractAddress, DEPLOYMENT_BLOCK } from "@/lib/viem-config";
 import { PULSEERS_ABI } from "@/lib/contracts";
 
+// CRITICAL: Force Node.js runtime (not Edge)
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const maxDuration = 300; // 5 minutes max
+
 /**
  * API Route: Get all matches from contract
  * Pattern from SeersLeague - server-side contract reading

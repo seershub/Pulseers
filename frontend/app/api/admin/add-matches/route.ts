@@ -5,6 +5,11 @@ import { privateKeyToAccount } from "viem/accounts";
 import { footballAPI, FootballAPI } from "@/lib/football-api";
 import { PULSEERS_ABI, PULSEERS_ADDRESS } from "@/lib/contracts";
 
+// CRITICAL: Force Node.js runtime (not Edge)
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const maxDuration = 300; // 5 minutes max
+
 /**
  * Admin API Endpoint to Add Matches On-Chain
  *
