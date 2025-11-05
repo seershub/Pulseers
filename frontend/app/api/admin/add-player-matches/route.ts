@@ -52,12 +52,35 @@ const PLAYER_MATCHES = [
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    // Parse request body
+    let body;
+    try {
+      body = await request.json();
+    } catch (parseError) {
+      console.error("❌ JSON parse error:", parseError);
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Invalid JSON in request body",
+          message: "Please send valid JSON with adminKey field",
+          example: { adminKey: "0x..." }
+        },
+        { status: 400 }
+      );
+    }
+
     const { adminKey } = body;
 
-    if (!adminKey) {
+    // Check for admin key from body or environment
+    const finalAdminKey = adminKey || process.env.ADMIN_PRIVATE_KEY;
+
+    if (!finalAdminKey) {
       return NextResponse.json(
-        { error: "adminKey is required" },
+        {
+          success: false,
+          error: "adminKey is required",
+          message: "Send adminKey in request body or set ADMIN_PRIVATE_KEY env variable"
+        },
         { status: 400 }
       );
     }
@@ -65,7 +88,7 @@ export async function POST(request: NextRequest) {
     console.log("🔐 Creating admin wallet...");
 
     // Create admin wallet
-    const account = privateKeyToAccount(adminKey as `0x${string}`);
+    const account = privateKeyToAccount(finalAdminKey as `0x${string}`);
     console.log("✅ Admin address:", account.address);
 
     // Create clients

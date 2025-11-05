@@ -52,45 +52,58 @@ export function MatchCard({ match, index, onSignalSuccess }: MatchCardProps) {
 
     try {
       console.log("🎯 Starting signal transaction...");
+      console.log("📝 Match ID:", match.matchId.toString());
+      console.log("🏆 Team ID:", teamId);
+
       const txHash = await signal(match.matchId, teamId);
-      console.log("✅ Signal successful, txHash:", txHash);
+      console.log("✅ Signal transaction successful!");
+      console.log("📤 TX Hash:", txHash);
 
-      // IMPORTANT: Show success popup IMMEDIATELY
+      // IMPORTANT: Show success popup IMMEDIATELY after transaction
+      console.log("🎉 Showing success popup NOW");
       setShowSuccess(true);
-      console.log("✅ Success popup shown");
 
-      // Wait for transaction to be indexed
+      // Wait for transaction to be indexed on blockchain
       console.log("⏳ Waiting 2 seconds for blockchain indexing...");
       await new Promise(resolve => setTimeout(resolve, 2000));
 
-      // Refetch user signal state
+      // Refetch user signal state to update UI
       console.log("🔄 Refetching user signal state...");
       await refetch();
 
       // CRITICAL: Refetch all matches to update signal counts
       if (onSignalSuccess) {
-        console.log("🔄 Refetching all matches...");
+        console.log("🔄 Triggering matches refetch...");
         onSignalSuccess();
       }
 
-      // Hide success popup after 3 seconds total (1 second remaining)
+      // Auto-hide success popup after 3 seconds
+      console.log("⏰ Setting timer to hide success popup in 3 seconds");
       setTimeout(() => {
         console.log("👋 Hiding success popup");
         setShowSuccess(false);
         setSelectedTeam(null);
-      }, 1000);
+      }, 3000);
     } catch (error: any) {
-      console.error("❌ Signal error:", error);
+      console.error("❌ Signal transaction failed:", error);
+      console.error("❌ Error message:", error.message);
+      console.error("❌ Error code:", error.code);
+
+      // Reset states on error
       setShowSuccess(false);
       setSelectedTeam(null);
 
-      // Better error messages
-      if (error.message?.includes("rejected")) {
-        alert("Transaction was rejected. Please try again.");
-      } else if (error.message?.includes("Match does not exist")) {
-        alert("This match has not been registered in the contract yet. Please contact admin.");
+      // Better error messages based on error type
+      if (error.message?.includes("rejected") || error.message?.includes("denied")) {
+        alert("❌ Transaction was rejected. Please try again.");
+      } else if (error.message?.includes("Match does not exist") || error.message?.includes("Match not found")) {
+        alert("⚠️ This match hasn't been added to the contract yet.\n\nFor player signals: Admin needs to run the add-player-matches endpoint first.\n\nPlease contact support.");
+      } else if (error.message?.includes("already signaled")) {
+        alert("⚠️ You have already signaled for this match.");
+      } else if (error.message?.includes("switch")) {
+        alert("⚠️ Please switch your wallet to Base Mainnet and try again.");
       } else {
-        alert(error.message || "Failed to submit signal. Please try again.");
+        alert(`❌ Transaction failed: ${error.message || "Unknown error"}\n\nPlease try again.`);
       }
     }
   };
@@ -301,15 +314,18 @@ export function MatchCard({ match, index, onSignalSuccess }: MatchCardProps) {
         </div>
       )}
 
-      {/* Success Animation - Show for 3 seconds */}
-      {(showSuccess || (isSuccess && selectedTeam)) && (
+      {/* Success Animation Popup - Shows after successful signal */}
+      {showSuccess && selectedTeam && (
         <motion.div
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0, opacity: 0 }}
           transition={{ duration: 0.3 }}
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-          onClick={() => setSelectedTeam(null)}
+          onClick={() => {
+            setShowSuccess(false);
+            setSelectedTeam(null);
+          }}
         >
           <motion.div
             initial={{ scale: 0.8, y: 20 }}

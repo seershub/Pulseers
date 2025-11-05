@@ -26,7 +26,7 @@ interface PlayerCardProps {
 export function PlayerCard({ player, index, onSignal, hasSignaled }: PlayerCardProps) {
   const { isConnected } = useWallet();
   const [isPending, setIsPending] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const handleSignal = async () => {
     if (!isConnected) {
@@ -42,17 +42,36 @@ export function PlayerCard({ player, index, onSignal, hasSignaled }: PlayerCardP
     if (isPending || !onSignal) return;
 
     setIsPending(true);
-    setIsSuccess(false);
+    setShowSuccess(false);
 
     try {
+      console.log("🎯 Signaling player:", player.id);
       await onSignal(player.id);
-      setIsSuccess(true);
+      console.log("✅ Player signal successful!");
+
+      // Show success popup
+      setShowSuccess(true);
+      console.log("🎉 Showing success popup");
+
+      // Auto-hide after 3 seconds
       setTimeout(() => {
-        setIsSuccess(false);
-      }, 2000);
+        setShowSuccess(false);
+      }, 3000);
     } catch (error: any) {
-      console.error("Player signal error:", error);
-      alert(error.message || "Failed to signal player");
+      console.error("❌ Player signal failed:", error);
+
+      // Better error messages
+      if (error.message?.includes("rejected") || error.message?.includes("denied")) {
+        alert("❌ Transaction was rejected. Please try again.");
+      } else if (error.message?.includes("Match does not exist") || error.message?.includes("Match not found") || error.message?.includes("not set up")) {
+        alert("⚠️ Player signals are not set up yet.\n\nAdmin needs to run: POST /api/admin/add-player-matches\n\nPlease contact support.");
+      } else if (error.message?.includes("already signaled")) {
+        alert("⚠️ You have already signaled for this player.");
+      } else if (error.message?.includes("switch")) {
+        alert("⚠️ Please switch your wallet to Base Mainnet and try again.");
+      } else {
+        alert(`❌ Failed to signal: ${error.message || "Unknown error"}\n\nPlease try again.`);
+      }
     } finally {
       setIsPending(false);
     }
@@ -119,7 +138,7 @@ export function PlayerCard({ player, index, onSignal, hasSignaled }: PlayerCardP
                 "bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600",
                 "text-white shadow-md hover:shadow-lg",
                 "disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2",
-                isSuccess && "from-green-500 to-green-600"
+                showSuccess && "from-green-500 to-green-600"
               )}
             >
               {isPending ? (
@@ -127,7 +146,7 @@ export function PlayerCard({ player, index, onSignal, hasSignaled }: PlayerCardP
                   <Loader2 className="w-4 h-4 animate-spin" />
                   <span>Signaling...</span>
                 </>
-              ) : isSuccess ? (
+              ) : showSuccess ? (
                 <>
                   <CheckCircle2 className="w-4 h-4" />
                   <span>Success!</span>
@@ -159,6 +178,59 @@ export function PlayerCard({ player, index, onSignal, hasSignaled }: PlayerCardP
           )}
         </div>
       </div>
+
+      {/* Success Animation Popup - Full Screen */}
+      {showSuccess && (
+        <motion.div
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0, opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+          onClick={() => setShowSuccess(false)}
+        >
+          <motion.div
+            initial={{ scale: 0.8, y: 20 }}
+            animate={{ scale: 1, y: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            className="glass-card p-8 max-w-md mx-4 shadow-2xl border-2 border-green-200 bg-gradient-to-br from-white to-green-50/30"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: [0, 1.2, 1] }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="mb-4"
+            >
+              <CheckCircle2 className="w-20 h-20 text-green-500 mx-auto drop-shadow-lg" />
+            </motion.div>
+            <motion.h3
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="text-2xl font-black gradient-text text-center mb-2"
+            >
+              Player Signaled!
+            </motion.h3>
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4 }}
+              className="text-sm text-gray-600 text-center mb-2"
+            >
+              You signaled for {player.name}
+            </motion.p>
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="text-xs text-gray-500 text-center"
+            >
+              Transaction confirmed on Base Mainnet
+            </motion.p>
+          </motion.div>
+        </motion.div>
+      )}
     </motion.div>
   );
 }
