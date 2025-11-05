@@ -389,7 +389,7 @@ export function MatchCard({ match, index, onSignalSuccess }: MatchCardProps) {
                   transition={{ delay: 0.3 }}
                   className="text-3xl font-black text-green-600 text-center mb-3"
                 >
-                  🎉 SIGNAL BAŞARILI! 🎉
+                  🎉 Signal Successful! 🎉
                 </motion.h3>
                 <motion.p
                   initial={{ opacity: 0 }}
@@ -397,7 +397,7 @@ export function MatchCard({ match, index, onSignalSuccess }: MatchCardProps) {
                   transition={{ delay: 0.4 }}
                   className="text-base text-gray-700 text-center mb-2 font-semibold"
                 >
-                  {successTeam === 1 ? match.teamA : match.teamB} için tahmin gönderildi!
+                  You signaled for {successTeam === 1 ? match.teamA : match.teamB}
                 </motion.p>
                 <motion.p
                   initial={{ opacity: 0 }}
@@ -405,7 +405,7 @@ export function MatchCard({ match, index, onSignalSuccess }: MatchCardProps) {
                   transition={{ delay: 0.5 }}
                   className="text-sm text-gray-600 text-center"
                 >
-                  ✅ Base Mainnet&apos;te onaylandı
+                  ✅ Confirmed on Base Mainnet
                 </motion.p>
               </motion.div>
             </motion.div>
