@@ -1,0 +1,233 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Base.org Color Palette */
+    --base-blue: #0052FF;
+    --base-blue-dark: #0042CC;
+    --base-blue-light: #1A6AFF;
+    --base-white: #FFFFFF;
+    --base-black: #000000;
+    --base-gray-50: #F9FAFB;
+    --base-gray-100: #F3F4F6;
+    --base-gray-200: #E5E7EB;
+    --base-gray-300: #D1D5DB;
+    --base-gray-400: #9CA3AF;
+    --base-gray-500: #6B7280;
+    --base-gray-600: #4B5563;
+    --base-gray-700: #374151;
+    --base-gray-800: #1F2937;
+    --base-gray-900: #111827;
+  }
+
+  * {
+    border-color: rgba(0, 82, 255, 0.1);
+  }
+
+  html {
+    overflow-x: hidden;
+    width: 100%;
+  }
+
+  body {
+    @apply bg-gradient-to-br from-white via-blue-50 to-blue-100 text-gray-900 min-h-screen;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    overflow-x: hidden;
+    width: 100%;
+    position: relative;
+  }
+}
+
+@layer components {
+  /* Glass Card - Base.org Style */
+  .glass-card {
+    @apply bg-white/80 backdrop-blur-xl border border-blue-100/50 shadow-xl shadow-blue-500/5;
+  }
+
+  /* Gradient Text */
+  .gradient-text {
+    @apply bg-gradient-to-r from-blue-600 via-blue-500 to-blue-400 bg-clip-text text-transparent font-bold;
+  }
+
+  /* Blue Gradient Button */
+  .btn-primary {
+    @apply bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-semibold rounded-xl px-6 py-3 transition-all duration-300 shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/50 hover:scale-105 active:scale-95;
+  }
+
+  /* Secondary Button */
+  .btn-secondary {
+    @apply bg-white/90 hover:bg-white text-blue-600 font-semibold rounded-xl px-6 py-3 border border-blue-200 transition-all duration-300 hover:border-blue-300 hover:shadow-lg hover:scale-105 active:scale-95;
+  }
+
+  /* Signal Button Base */
+  .signal-btn {
+    @apply relative overflow-hidden rounded-2xl p-4 transition-all duration-500 transform hover:scale-105 active:scale-95;
+  }
+
+  /* Signal Animation */
+  .signal-pulse {
+    animation: signal-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes signal-pulse {
+    0%, 100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.8;
+      transform: scale(1.05);
+    }
+  }
+
+  /* Match Card Hover Effect - Enhanced */
+  .match-card {
+    @apply glass-card rounded-3xl p-6 md:p-8 transition-all duration-500;
+    @apply border-2 border-blue-100/80;
+    @apply hover:shadow-2xl hover:shadow-blue-500/25 hover:-translate-y-2 hover:border-blue-200;
+    @apply cursor-pointer;
+  }
+
+  /* Shimmer Effect */
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(0, 82, 255, 0.1),
+      transparent
+    );
+    background-size: 200% 100%;
+    animation: shimmer 3s infinite;
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  /* Team Badge - Enhanced */
+  .team-badge {
+    @apply w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-white shadow-xl border-2 border-blue-50 flex items-center justify-center p-2 transition-all duration-300 hover:scale-110 hover:shadow-2xl hover:border-blue-100;
+  }
+
+  /* Signal Bar */
+  .signal-bar {
+    @apply h-3 rounded-full overflow-hidden bg-gray-100 relative;
+  }
+
+  .signal-bar-fill {
+    @apply h-full transition-all duration-1000 ease-out;
+  }
+
+  /* Live Badge - Enhanced */
+  .live-badge {
+    @apply flex items-center gap-2 px-4 py-2 bg-red-50 border-2 border-red-500 rounded-full shadow-lg;
+    animation: live-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes live-pulse {
+    0%, 100% {
+      box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+    }
+    50% {
+      box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
+    }
+  }
+
+  /* Stats Card */
+  .stats-card {
+    @apply glass-card rounded-2xl p-4 text-center;
+  }
+
+  /* Profile Avatar */
+  .profile-avatar {
+    @apply w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold shadow-lg;
+  }
+
+  /* Header - Enhanced with prominent border */
+  .header-glass {
+    @apply bg-white/95 backdrop-blur-xl border-b-2 border-blue-200/80 shadow-md;
+  }
+
+  /* Badge - Enhanced */
+  .badge {
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold shadow-md;
+  }
+
+  .badge-primary {
+    @apply bg-blue-100 text-blue-700 border-2 border-blue-200;
+  }
+
+  .badge-success {
+    @apply bg-green-100 text-green-700 border-2 border-green-200;
+  }
+
+  /* Floating Animation */
+  .float-animation {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  /* Glow Effect */
+  .glow-blue {
+    box-shadow: 0 0 20px rgba(0, 82, 255, 0.3);
+  }
+
+  /* Loading Spinner */
+  .spinner {
+    @apply animate-spin rounded-full border-4 border-blue-200 border-t-blue-600;
+  }
+
+  /* Score Display */
+  .score-display {
+    @apply text-5xl font-black text-blue-600 tabular-nums;
+  }
+
+  /* Percentage Display */
+  .percentage-display {
+    @apply text-3xl font-bold bg-gradient-to-br from-blue-600 to-blue-500 bg-clip-text text-transparent;
+  }
+
+  /* VS Badge - Enhanced */
+  .vs-badge {
+    @apply w-12 h-12 md:w-14 md:h-14 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-black text-sm md:text-base shadow-xl border-2 border-white;
+  }
+}
+
+@layer utilities {
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
