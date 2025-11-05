@@ -7,21 +7,35 @@ import { createPublicClient, http } from "viem";
 import { base } from "viem/chains";
 
 /**
+ * Get RPC URL with fallback options
+ * Priority: Alchemy > Custom RPC > Cloudflare Public > Base Public
+ */
+function getRpcUrl(): string {
+  // Option 1: Alchemy (best, most reliable)
+  if (process.env.NEXT_PUBLIC_ALCHEMY_API_KEY) {
+    return `https://base-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`;
+  }
+
+  // Option 2: Custom RPC URL
+  if (process.env.NEXT_PUBLIC_BASE_RPC_URL) {
+    return process.env.NEXT_PUBLIC_BASE_RPC_URL;
+  }
+
+  // Option 3: Cloudflare public RPC (more reliable than base.org)
+  return "https://base.llamarpc.com";
+}
+
+/**
  * Public client for reading contract data
- * Uses Alchemy for production reliability (like SeersLeague)
+ * Uses multiple RPC fallbacks for reliability
  */
 export const publicClient = createPublicClient({
   chain: base,
-  transport: http(
-    process.env.NEXT_PUBLIC_ALCHEMY_API_KEY
-      ? `https://base-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`
-      : process.env.NEXT_PUBLIC_BASE_RPC_URL || "https://mainnet.base.org",
-    {
-      timeout: 180_000, // 180 seconds like SeersLeague
-      retryCount: 5,
-      retryDelay: 1000,
-    }
-  ),
+  transport: http(getRpcUrl(), {
+    timeout: 180_000, // 180 seconds like SeersLeague
+    retryCount: 5,
+    retryDelay: 1000,
+  }),
 });
 
 /**
