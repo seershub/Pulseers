@@ -37,22 +37,29 @@ export function usePlayerSignal() {
   const { switchChainAsync } = useSwitchChain();
 
   /**
-   * Convert player ID string to numeric match ID
-   * Format: 9000000000 + hash(playerId) % 1000000
-   * This ensures player IDs don't conflict with regular match IDs (which are < 1000000)
+   * CRITICAL: Use EXACT same matchIds as in the contract!
+   * These were added via /api/admin/add-player-matches
+   *
+   * DO NOT use hash function - must match contract exactly
    */
+  const PLAYER_MATCH_IDS: Record<string, bigint> = {
+    "arda-guler": 9000795967n,
+    "kylian-mbappe": 9000193399n,
+    "lamine-yamal": 9000556558n,
+    "kenan-yildiz": 9000506025n,
+  };
+
   const playerIdToMatchId = (playerId: string): bigint => {
-    // Simple hash function for player ID
-    let hash = 0;
-    for (let i = 0; i < playerId.length; i++) {
-      const char = playerId.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash = hash & hash; // Convert to 32bit integer
+    const matchId = PLAYER_MATCH_IDS[playerId];
+
+    if (!matchId) {
+      console.error(`❌ Unknown player ID: ${playerId}`);
+      console.error(`   Available players:`, Object.keys(PLAYER_MATCH_IDS));
+      throw new Error(`Unknown player ID: ${playerId}. Available: ${Object.keys(PLAYER_MATCH_IDS).join(", ")}`);
     }
-    // Use 9000000000 as base to avoid conflicts with real match IDs
-    // Add hash modulo 1000000 to keep it reasonable
-    const numericId = 9000000000 + (Math.abs(hash) % 1000000);
-    return BigInt(numericId);
+
+    console.log(`🎯 Player ID "${playerId}" → Match ID ${matchId.toString()}`);
+    return matchId;
   };
 
   const signal = async (playerId: string) => {
@@ -61,13 +68,19 @@ export function usePlayerSignal() {
     setIsSuccess(false);
 
     try {
-      // Convert player ID to match ID
+      // Convert player ID to match ID using EXACT contract values
       const matchId = playerIdToMatchId(playerId);
       // Use teamId 1 for all player signals
       const teamId = 1;
 
-      console.log("🎯 Submitting player signal:", { playerId, matchId: matchId.toString(), teamId });
-      console.log("⚠️ NOTE: This matchId must exist in the contract for the transaction to succeed!");
+      console.log("========================================");
+      console.log("🎯 PLAYER SIGNAL TRANSACTION");
+      console.log("========================================");
+      console.log("Player ID:", playerId);
+      console.log("Match ID:", matchId.toString());
+      console.log("Team ID:", teamId);
+      console.log("Contract:", getContractAddress());
+      console.log("========================================");
 
       // Use Farcaster wallet if detected, otherwise use regular wallet
       let clientToUse = walletClient;
@@ -177,26 +190,38 @@ export function usePlayerSignal() {
 
       return txHash;
     } catch (err: any) {
-      console.error("❌ Player signal error:", err);
+      console.error("========================================");
+      console.error("❌ PLAYER SIGNAL ERROR");
+      console.error("========================================");
+      console.error("Player ID:", playerId);
+      console.error("Error:", err.message);
+      console.error("Full error:", err);
+      console.error("========================================");
 
-      // Provide helpful error message if matchId doesn't exist
-      if (err.message?.includes("Match not found") || err.message?.includes("invalid match")) {
-        const matchId = playerIdToMatchId(playerId);
+      // Check if it's unknown player ID error (from our validation)
+      if (err.message?.includes("Unknown player ID")) {
+        setError(err);
+        setIsPending(false);
+        setIsSuccess(false);
+        throw err;
+      }
+
+      // Check if matchId doesn't exist in contract
+      if (err.message?.includes("Match does not exist") || err.message?.includes("Match not found") || err.message?.includes("execution reverted")) {
         console.error(`
-⚠️ PLAYER SIGNAL SETUP REQUIRED:
+⚠️ CONTRACT SYNC ISSUE:
 
-This player's matchId (${matchId.toString()}) doesn't exist in the contract yet.
+The matchId was added to the contract but might not be indexed yet.
 
-To fix this, the admin must add this player as a "virtual match":
-1. Go to /api/admin/add-player-matches
-2. OR manually call contract.addMatches() with:
-   - matchId: ${matchId.toString()}
-   - teamA: "${playerId}"
-   - teamB: "Player Signal"
-   - league: "Top Players"
-   - startTime: far future date
+Solutions:
+1. Wait 30 seconds and try again (blockchain indexing)
+2. Verify transaction on BaseScan
+3. Check if player matches were added successfully
+
+Player: ${playerId}
+Expected Match ID: ${PLAYER_MATCH_IDS[playerId]?.toString() || "UNKNOWN"}
         `);
-        throw new Error(`Player signal not set up in contract yet. Admin must add matchId ${matchId.toString()} first.`);
+        throw new Error(`Match not found in contract. The blockchain may still be indexing. Wait 30 seconds and try again.`);
       }
 
       setError(err);
