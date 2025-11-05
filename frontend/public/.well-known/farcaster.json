@@ -1,0 +1,16 @@
+{
+  "accountAssociation": {
+    "header": "eyJmaWQiOjEsInR5cGUiOiJjdXN0b2R5Iiwia2V5IjoiMHgwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwIn0",
+    "payload": "eyJkb21haW4iOiJwdWxzZWVycy5zZWVyc2h1Yi5jb20ifQ",
+    "signature": "MHg..."
+  },
+  "frame": {
+    "version": "1",
+    "name": "Pulseers",
+    "iconUrl": "https://pulseers.seershub.com/icon-512.png",
+    "splashImageUrl": "https://pulseers.seershub.com/splash.png",
+    "splashBackgroundColor": "#0a0f1e",
+    "homeUrl": "https://pulseers.seershub.com",
+    "webhookUrl": "https://pulseers.seershub.com/api/webhook"
+  }
+}
