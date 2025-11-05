@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useWalletClient, usePublicClient } from "wagmi";
+import { useWalletClient, usePublicClient, useSwitchChain } from "wagmi";
 import { getContractAddress } from "@/lib/viem-config";
 import { PULSEERS_ABI } from "@/lib/contracts";
 import { createWalletClient, custom, type Account } from "viem";
@@ -34,6 +34,7 @@ export function usePlayerSignal() {
   const { address, isFarcaster } = useWallet();
   const { data: walletClient } = useWalletClient();
   const publicClient = usePublicClient();
+  const { switchChainAsync } = useSwitchChain();
 
   /**
    * Convert player ID string to numeric match ID
@@ -105,6 +106,39 @@ export function usePlayerSignal() {
 
       if (!publicClient) {
         throw new Error("Public client not available");
+      }
+
+      // CRITICAL: Check chain and switch if needed (for non-Farcaster wallets)
+      if (!isFarcaster && clientToUse) {
+        try {
+          const chainId = await clientToUse.getChainId();
+          console.log("🔗 Current Wallet Chain ID:", chainId);
+          console.log("🎯 Target Chain ID:", base.id, "(Base Mainnet)");
+
+          if (chainId !== base.id) {
+            console.log(`⚠️ Wrong network! Switching from chain ${chainId} to Base Mainnet (${base.id})...`);
+
+            // Ask user to switch network
+            try {
+              await switchChainAsync({ chainId: base.id });
+              console.log("✅ Successfully switched to Base Mainnet");
+            } catch (switchError: any) {
+              console.error("❌ Failed to switch network:", switchError);
+              throw new Error(
+                `Please switch your wallet to Base Mainnet. Current: Chain ${chainId}, Required: Base Mainnet (${base.id})`
+              );
+            }
+          } else {
+            console.log("✅ Already on Base Mainnet");
+          }
+        } catch (err: any) {
+          if (err.message?.includes("switch")) {
+            throw err; // Re-throw switch errors
+          }
+          console.warn("⚠️ Could not verify wallet chain ID:", err.message);
+        }
+      } else {
+        console.log("✅ Farcaster wallet - automatically on Base Mainnet");
       }
 
       // Send transaction to Base Mainnet

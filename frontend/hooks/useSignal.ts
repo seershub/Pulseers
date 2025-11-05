@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useWalletClient, usePublicClient } from "wagmi";
+import { useWalletClient, usePublicClient, useSwitchChain } from "wagmi";
 import { getContractAddress } from "@/lib/viem-config";
 import { PULSEERS_ABI } from "@/lib/contracts";
 import { createWalletClient, custom, type Account } from "viem";
@@ -15,6 +15,8 @@ import { useWallet } from "@/hooks/useWallet";
  * - Browser wallets (MetaMask, Zerion, Rainbow, etc.)
  * - Coinbase Wallet / Smart Wallet
  * - Farcaster Mini App wallet (auto-detected)
+ *
+ * AUTO-SWITCHES to Base Mainnet if wallet is on wrong chain
  */
 export function useSignal() {
   const [isPending, setIsPending] = useState(false);
@@ -25,6 +27,7 @@ export function useSignal() {
   const { address, isFarcaster } = useWallet();
   const { data: walletClient } = useWalletClient();
   const publicClient = usePublicClient();
+  const { switchChainAsync } = useSwitchChain();
 
   const signal = async (matchId: bigint, teamId: 1 | 2) => {
     setIsPending(true);
@@ -80,30 +83,40 @@ export function useSignal() {
         throw new Error("Public client not available");
       }
 
-      // IMPORTANT: Transaction is always forced to Base Mainnet via chain: base parameter
-      // For Farcaster wallet, we skip chain check (always Base Mainnet)
-      // For regular wallets, we log but don't block
-      if (!isFarcaster) {
+      // CRITICAL: Check chain and switch if needed (for non-Farcaster wallets)
+      if (!isFarcaster && clientToUse) {
         try {
           const chainId = await clientToUse.getChainId();
-          console.log("🔗 Wallet Chain ID:", chainId);
+          console.log("🔗 Current Wallet Chain ID:", chainId);
+          console.log("🎯 Target Chain ID:", base.id, "(Base Mainnet)");
 
-          if (chainId === 84532) {
-            console.warn("⚠️ Wallet reports Base Sepolia, but forcing Base Mainnet transaction");
-          } else if (chainId !== 8453) {
-            console.warn(`⚠️ Wallet reports Chain ID ${chainId}, but forcing Base Mainnet transaction`);
+          if (chainId !== base.id) {
+            console.log(`⚠️ Wrong network! Switching from chain ${chainId} to Base Mainnet (${base.id})...`);
+
+            // Ask user to switch network
+            try {
+              await switchChainAsync({ chainId: base.id });
+              console.log("✅ Successfully switched to Base Mainnet");
+            } catch (switchError: any) {
+              console.error("❌ Failed to switch network:", switchError);
+              throw new Error(
+                `Please switch your wallet to Base Mainnet. Current: Chain ${chainId}, Required: Base Mainnet (${base.id})`
+              );
+            }
           } else {
-            console.log("✅ Correct network: Base Mainnet");
+            console.log("✅ Already on Base Mainnet");
           }
         } catch (err: any) {
-          // Transaction will be forced to Base Mainnet anyway
-          console.warn("⚠️ Could not verify wallet chain ID, but proceeding with Base Mainnet:", err);
+          if (err.message?.includes("switch")) {
+            throw err; // Re-throw switch errors
+          }
+          console.warn("⚠️ Could not verify wallet chain ID:", err.message);
         }
       } else {
         console.log("✅ Farcaster wallet - automatically on Base Mainnet");
       }
 
-      // Send transaction directly without simulation
+      // Send transaction directly
       console.log("📤 Sending transaction to Base Mainnet...");
 
       const txHash = await clientToUse.writeContract({
@@ -111,7 +124,7 @@ export function useSignal() {
         abi: PULSEERS_ABI,
         functionName: "signal",
         args: [matchId, teamId],
-        account: accountToUse, // TypeScript now knows this is not null
+        account: accountToUse,
         chain: base,
       });
 
