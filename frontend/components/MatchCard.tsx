@@ -405,7 +405,7 @@ export function MatchCard({ match, index, onSignalSuccess }: MatchCardProps) {
                   transition={{ delay: 0.5 }}
                   className="text-sm text-gray-600 text-center"
                 >
-                  ✅ Base Mainnet'te onaylandı
+                  ✅ Base Mainnet&apos;te onaylandı
                 </motion.p>
               </motion.div>
             </motion.div>
