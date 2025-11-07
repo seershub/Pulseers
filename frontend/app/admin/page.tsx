@@ -8,6 +8,27 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const [testingApi, setTestingApi] = useState(false);
+  const [apiTestResult, setApiTestResult] = useState<any>(null);
+
+  const handleTestApi = async () => {
+    setTestingApi(true);
+    setApiTestResult(null);
+
+    try {
+      const response = await fetch("/api/admin/test-football-api");
+      const data = await response.json();
+      setApiTestResult(data);
+    } catch (err: any) {
+      setApiTestResult({
+        status: "❌ FAILED",
+        error: "Request failed",
+        message: err.message
+      });
+    } finally {
+      setTestingApi(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,12 +67,69 @@ export default function AdminPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-950 p-8">
       <div className="max-w-4xl mx-auto">
         <div className="glass-card rounded-3xl p-8 mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">
-            Pulseers Admin Panel
-          </h1>
-          <p className="text-slate-300">
-            Add upcoming football matches to the smart contract
-          </p>
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h1 className="text-4xl font-bold text-white mb-2">
+                Pulseers Admin Panel
+              </h1>
+              <p className="text-slate-300">
+                Add upcoming football matches to the smart contract
+              </p>
+            </div>
+            <button
+              onClick={handleTestApi}
+              disabled={testingApi}
+              className="px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/50 text-blue-300 rounded-lg transition-all disabled:opacity-50"
+            >
+              {testingApi ? "Testing..." : "🧪 Test API"}
+            </button>
+          </div>
+
+          {/* API Test Result */}
+          {apiTestResult && (
+            <div className={`mt-4 p-4 rounded-lg border ${
+              apiTestResult.status?.includes("✅")
+                ? "bg-green-500/10 border-green-500/30"
+                : "bg-red-500/10 border-red-500/30"
+            }`}>
+              <h3 className={`font-semibold mb-2 ${
+                apiTestResult.status?.includes("✅") ? "text-green-400" : "text-red-400"
+              }`}>
+                {apiTestResult.status}
+              </h3>
+              <p className="text-sm text-slate-300 mb-2">{apiTestResult.message}</p>
+
+              {apiTestResult.configured === false && (
+                <div className="mt-3 space-y-2 text-xs text-slate-400">
+                  <p className="font-semibold text-yellow-400">📝 How to fix:</p>
+                  {apiTestResult.solution && Object.entries(apiTestResult.solution).map(([key, value]) => (
+                    <p key={key}>• {value as string}</p>
+                  ))}
+                </div>
+              )}
+
+              {apiTestResult.testResult && (
+                <div className="mt-3 text-xs text-slate-400">
+                  <p>✅ Found {apiTestResult.testResult.matchesFound} match(es)</p>
+                  {apiTestResult.testResult.sampleMatch && (
+                    <p className="mt-1">
+                      Sample: {apiTestResult.testResult.sampleMatch.homeTeam} vs{" "}
+                      {apiTestResult.testResult.sampleMatch.awayTeam}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {apiTestResult.possibleReasons && (
+                <div className="mt-3 space-y-1 text-xs text-slate-400">
+                  <p className="font-semibold text-yellow-400">Possible reasons:</p>
+                  {apiTestResult.possibleReasons.map((reason: string, i: number) => (
+                    <p key={i}>• {reason}</p>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="glass-card rounded-3xl p-8">
