@@ -66,15 +66,68 @@ export async function POST(request: NextRequest) {
 
     // Fetch matches from API
     console.log("Fetching matches from Football Data API...");
-    const matches = await footballAPI.getUpcomingMatches();
+    const allMatches = await footballAPI.getUpcomingMatches();
 
-    if (matches.length === 0) {
+    if (allMatches.length === 0) {
       return NextResponse.json(
         {
           error: "No matches found from API",
           hint: "Check if NEXT_PUBLIC_FOOTBALL_API_KEY is set in environment variables. Get free API key from https://www.football-data.org/"
         },
         { status: 404 }
+      );
+    }
+
+    // CRITICAL: Filter out matches that already exist in contract
+    console.log(`Fetched ${allMatches.length} matches from API. Checking for duplicates...`);
+
+    // Get existing match IDs from contract
+    let existingMatchIds: bigint[] = [];
+    try {
+      existingMatchIds = (await publicClient.readContract({
+        address: PULSEERS_ADDRESS,
+        abi: PULSEERS_ABI,
+        functionName: "getAllMatchIds",
+      })) as bigint[];
+
+      console.log(`Found ${existingMatchIds.length} existing matches in contract`);
+    } catch (error) {
+      console.warn("Could not fetch existing matches (contract might be empty):", error);
+    }
+
+    // Filter out existing matches and old matches
+    const now = Math.floor(Date.now() / 1000);
+    const matches = allMatches.filter((match) => {
+      const matchId = BigInt(match.id);
+      const isNotDuplicate = !existingMatchIds.includes(matchId);
+      const isFuture = match.startTime > now;
+
+      if (!isNotDuplicate) {
+        console.log(`  ❌ Skipping duplicate match ID ${match.id}: ${match.homeTeam.name} vs ${match.awayTeam.name}`);
+      }
+      if (!isFuture) {
+        console.log(`  ❌ Skipping past match ID ${match.id}: ${match.homeTeam.name} vs ${match.awayTeam.name} (${new Date(match.startTime * 1000).toISOString()})`);
+      }
+
+      return isNotDuplicate && isFuture;
+    });
+
+    console.log(`After filtering: ${matches.length} new matches to add`);
+
+    if (matches.length === 0) {
+      return NextResponse.json(
+        {
+          error: "No new matches to add",
+          message: "All upcoming matches from API are already in the contract or are in the past",
+          stats: {
+            fetchedFromApi: allMatches.length,
+            alreadyInContract: allMatches.filter(m => existingMatchIds.includes(BigInt(m.id))).length,
+            pastMatches: allMatches.filter(m => m.startTime <= now).length,
+            availableToAdd: 0
+          },
+          suggestion: "Matches are automatically added. Check back later for new matches, or try increasing the date range in the API configuration."
+        },
+        { status: 400 }
       );
     }
 
@@ -148,6 +201,12 @@ export async function POST(request: NextRequest) {
       success: true,
       transactionHash: hash,
       matchesAdded: matchIds.length,
+      stats: {
+        fetchedFromApi: allMatches.length,
+        duplicatesSkipped: allMatches.filter(m => existingMatchIds.includes(BigInt(m.id))).length,
+        pastMatchesSkipped: allMatches.filter(m => m.startTime <= now).length,
+        newMatchesAdded: matchIds.length
+      },
       matches: matchesToAdd.map((m) => ({
         id: m.id,
         homeTeam: m.homeTeam.name,

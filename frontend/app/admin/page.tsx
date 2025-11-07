@@ -199,6 +199,32 @@ export default function AdminPage() {
               </h3>
 
               <div className="space-y-4">
+                {/* Statistics */}
+                {result.stats && (
+                  <div className="grid grid-cols-2 gap-3 mb-4">
+                    <div className="p-3 bg-white/5 rounded-lg">
+                      <p className="text-xs text-slate-400">Fetched from API</p>
+                      <p className="text-lg font-bold text-white">{result.stats.fetchedFromApi}</p>
+                    </div>
+                    <div className="p-3 bg-white/5 rounded-lg">
+                      <p className="text-xs text-slate-400">New Matches Added</p>
+                      <p className="text-lg font-bold text-green-400">{result.stats.newMatchesAdded}</p>
+                    </div>
+                    {result.stats.duplicatesSkipped > 0 && (
+                      <div className="p-3 bg-yellow-500/10 rounded-lg border border-yellow-500/20">
+                        <p className="text-xs text-yellow-400">Duplicates Skipped</p>
+                        <p className="text-lg font-bold text-yellow-300">{result.stats.duplicatesSkipped}</p>
+                      </div>
+                    )}
+                    {result.stats.pastMatchesSkipped > 0 && (
+                      <div className="p-3 bg-yellow-500/10 rounded-lg border border-yellow-500/20">
+                        <p className="text-xs text-yellow-400">Past Matches Skipped</p>
+                        <p className="text-lg font-bold text-yellow-300">{result.stats.pastMatchesSkipped}</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 <div>
                   <p className="text-sm text-slate-400">Transaction Hash</p>
                   <a
@@ -225,7 +251,7 @@ export default function AdminPage() {
                           {match.homeTeam} vs {match.awayTeam}
                         </p>
                         <p className="text-slate-400 text-sm">
-                          {match.league} • {match.startTime}
+                          {match.league} • {new Date(match.startTime).toLocaleDateString()}
                         </p>
                       </div>
                     ))}
