@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "./providers";
+import { OnboardingModal } from "@/components/OnboardingModal";
+import { FloatingGuideButton } from "@/components/FloatingGuideButton";
 
 export const metadata: Metadata = {
   title: "Pulseers - Daily Football Predictions",
@@ -63,7 +65,11 @@ export default function RootLayout({
   return (
     <html lang="en" className="overflow-x-hidden">
       <body className="overflow-x-hidden">
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+          <OnboardingModal />
+          <FloatingGuideButton />
+        </Providers>
       </body>
     </html>
   );
