@@ -1,0 +1,67 @@
+{
+  "name": "Pulseers - Football Predictions",
+  "short_name": "Pulseers",
+  "description": "Predict football matches daily. Signal your support for your favorite teams on-chain. Compete on leaderboards and earn rewards based on accuracy.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "orientation": "portrait-primary",
+  "noindex": false,
+  "primaryCategory": "social",
+  "icons": [
+    {
+      "src": "/icon-1024.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-1024.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-1024.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["social", "games", "entertainment"],
+  "screenshots": [
+    {
+      "src": "/og-image.png",
+      "sizes": "1200x630",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/hero.png",
+      "sizes": "1200x630",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Upcoming Matches",
+      "url": "/?filter=upcoming",
+      "description": "View upcoming matches"
+    },
+    {
+      "name": "Live Matches",
+      "url": "/?filter=live",
+      "description": "View live matches"
+    }
+  ],
+  "protocol_handlers": [
+    {
+      "protocol": "web+farcaster",
+      "url": "/?fc=%s"
+    }
+  ],
+  "prefer_related_applications": false,
+  "lang": "en"
+}

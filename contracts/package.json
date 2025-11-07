@@ -1,0 +1,25 @@
+{
+  "name": "pulseers-contracts",
+  "version": "1.0.0",
+  "description": "Smart contracts for Pulseers - Decentralized social signaling platform for football matches",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy:sepolia": "hardhat run scripts/deploy.ts --network baseSepolia",
+    "deploy:mainnet": "hardhat run scripts/deploy.ts --network base",
+    "verify": "hardhat verify --network baseSepolia",
+    "upgrade:sepolia": "hardhat run scripts/upgrade.ts --network baseSepolia",
+    "upgrade:mainnet": "hardhat run scripts/upgrade.ts --network base"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@nomicfoundation/hardhat-verify": "^2.0.0",
+    "@typechain/hardhat": "^9.1.0",
+    "hardhat": "^2.22.0",
+    "typescript": "^5.7.0"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts-upgradeable": "^5.1.0",
+    "@openzeppelin/hardhat-upgrades": "^3.5.0"
+  }
+}
