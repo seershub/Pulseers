@@ -275,7 +275,7 @@ export function PlayerCard({ player, index, onSignal, hasSignaled }: PlayerCardP
                 >
                   <SharePulseButton
                     teamName={player.name}
-                    matchId={player.playerId.toString()}
+                    matchId={player.id}
                   />
                 </motion.div>
               </motion.div>
