@@ -7,6 +7,7 @@ import { TrendingUp, Loader2, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useWallet } from "@/hooks/useWallet";
 import { createPortal } from "react-dom";
+import { SharePulseButton } from "./SharePulseButton";
 
 interface Player {
   id: string;
@@ -264,6 +265,19 @@ export function PlayerCard({ player, index, onSignal, hasSignaled }: PlayerCardP
                 >
                   ✅ Confirmed on Base Mainnet
                 </motion.p>
+
+                {/* Share Button */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6 }}
+                  className="flex justify-center mt-4"
+                >
+                  <SharePulseButton
+                    teamName={player.name}
+                    matchId={player.playerId.toString()}
+                  />
+                </motion.div>
               </motion.div>
             </motion.div>
           )}

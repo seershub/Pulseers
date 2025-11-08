@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Header } from "@/components/Header";
 import { MatchList } from "@/components/MatchList";
 import { PlayerCarousel } from "@/components/PlayerCarousel";
+import { ValuePropBox } from "@/components/ValuePropBox";
 import { motion } from "framer-motion";
 import { TrendingUp, Zap, CheckCircle, Trophy } from "lucide-react";
 import { sdk } from "@/lib/farcaster-sdk";
@@ -139,6 +140,9 @@ export default function HomePage() {
             );
           })}
         </motion.div>
+
+        {/* Value Proposition Box */}
+        <ValuePropBox />
 
         {/* Matches Display */}
         <motion.div

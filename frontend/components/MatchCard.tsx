@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { AnimatedSignalBar } from "./AnimatedSignalBar";
 import { createPortal } from "react-dom";
+import { SharePulseButton } from "./SharePulseButton";
 
 interface MatchCardProps {
   match: MatchWithStatus;
@@ -407,6 +408,19 @@ export function MatchCard({ match, index, onSignalSuccess }: MatchCardProps) {
                 >
                   ✅ Confirmed on Base Mainnet
                 </motion.p>
+
+                {/* Share Button */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6 }}
+                  className="flex justify-center mt-4"
+                >
+                  <SharePulseButton
+                    teamName={successTeam === 1 ? match.teamA : match.teamB}
+                    matchId={match.matchId.toString()}
+                  />
+                </motion.div>
               </motion.div>
             </motion.div>
           )}
