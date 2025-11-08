@@ -36,14 +36,10 @@ export function SharePulseButton({ teamName, matchId }: SharePulseButtonProps) {
       // Create cast with team name and embed
       const castText = `I just boosted ${teamName}! See the community pulse on Pulseers. ⚡️`;
 
-      // Use Farcaster SDK to create cast
-      const result = await sdk.actions.writeCast({
+      // Use Farcaster SDK to compose cast
+      const result = await sdk.actions.composeCast({
         text: castText,
-        embeds: [
-          {
-            url: 'https://pulseers.seershub.com'
-          }
-        ]
+        embeds: ['https://pulseers.seershub.com']
       });
 
       console.log("✅ Cast shared successfully:", result);
