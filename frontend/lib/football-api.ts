@@ -67,13 +67,15 @@ export class FootballAPI {
     }
 
     try {
-      // Get today and 14 days from now
-      const today = new Date();
+      // CRITICAL: Get matches from NOW to 14 days ahead (not from today 00:00)
+      const now = new Date();
       const futureDate = new Date();
-      futureDate.setDate(futureDate.getDate() + 14);
+      futureDate.setDate(futureDate.getDate() + 30); // Extend to 30 days for more matches
 
-      const dateFrom = today.toISOString().split("T")[0];
+      const dateFrom = now.toISOString().split("T")[0];
       const dateTo = futureDate.toISOString().split("T")[0];
+
+      console.log(`🔍 Fetching matches from ${dateFrom} to ${dateTo}`);
 
       // Fetch matches from top European leagues
       const competitions = [
@@ -90,7 +92,7 @@ export class FootballAPI {
       for (const competition of competitions) {
         try {
           const response = await fetch(
-            `${this.apiUrl}/competitions/${competition}/matches?dateFrom=${dateFrom}&dateTo=${dateTo}`,
+            `${this.apiUrl}/competitions/${competition}/matches?dateFrom=${dateFrom}&dateTo=${dateTo}&status=SCHEDULED,TIMED`,
             {
               headers: {
                 "X-Auth-Token": this.apiKey,
@@ -114,11 +116,17 @@ export class FootballAPI {
         }
       }
 
-      // Sort by start time
-      allMatches.sort((a, b) => a.startTime - b.startTime);
+      // CRITICAL: Filter to only FUTURE matches (from current time, not day)
+      const nowTimestamp = Math.floor(Date.now() / 1000);
+      const futureMatches = allMatches.filter(match => match.startTime > nowTimestamp);
 
-      // Return first 20 matches
-      return allMatches.slice(0, 20);
+      console.log(`📊 Total fetched: ${allMatches.length}, Future: ${futureMatches.length}`);
+
+      // Sort by start time
+      futureMatches.sort((a, b) => a.startTime - b.startTime);
+
+      // Return first 50 upcoming matches (increased from 20)
+      return futureMatches.slice(0, 50);
     } catch (error) {
       console.error("Error fetching matches:", error);
       return this.getMockMatches();
